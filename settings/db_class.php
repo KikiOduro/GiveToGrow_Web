@@ -24,12 +24,11 @@ if (!class_exists('db_connection')) {
         private function ensure_connected(): bool
         {
             // If already connected, verify it's alive
+            // If already connected, verify it's alive
             if ($this->db instanceof mysqli) {
-                if (method_exists($this->db, 'ping')) {
-                    $alive = $this->db->ping();
-                    if ($alive === true) {
-                        return true;
-                    }
+                $alive = @$this->db->query("SELECT 1");
+                if ($alive !== false) {
+                    return true;
                 }
             }
 
