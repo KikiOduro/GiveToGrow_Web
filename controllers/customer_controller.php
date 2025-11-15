@@ -22,6 +22,12 @@ function register_customer_ctr(string $name, string $email, string $password, st
     return $customerModel->createCustomer($name, $email, $passwordHash, $role);
 }
 
+function get_customer_by_email_ctr(string $email)
+{
+    $model = new CustomerModel();
+    return $model->getCustomerByEmail($email);
+}
+
 /**
  * Get a customer by email for login.
  *
