@@ -241,7 +241,7 @@ function e($value)
         <!-- Sign-up Link -->
         <div class="mt-8 text-center">
           <p class="text-sm text-gray-600 dark:text-gray-400">
-            Don't have an account?
+            Do not have an account?
             <a
               href="../register.php"
               class="font-medium text-primary hover:underline">Sign Up</a>
