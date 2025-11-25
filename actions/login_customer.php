@@ -14,7 +14,7 @@ $password = $_POST['password'] ?? '';
 // Basic validation
 if (trim($email) === '' || trim($password) === '') {
     $_SESSION['login_error'] = 'Email and password are required.';
-    header('Location: ../login.php');
+    header('Location: ../login/login.php');
     exit;
 }
 
@@ -26,14 +26,14 @@ if ($result && password_verify($password, $result['password_hash'])) {
     $_SESSION['user_id']    = $result['user_id'];
     $_SESSION['user_name']  = $result['user_name'];
     $_SESSION['user_email'] = $result['user_email'];
-    $_SESSION['user_role']  = $result['user_role'] ?? 'customer';
+    $_SESSION['user_role']  = $result['user_role'] ?? 2;
     $_SESSION['logged_in']  = true;
 
-    header('Location: ../index.php');
+    header('Location: ../dashboard.php');
     exit;
 }
 
 // Login failed
 $_SESSION['login_error'] = 'Invalid login credentials.';
-header('Location: ../login.php');
+header('Location: ../login/login.php');
 exit;

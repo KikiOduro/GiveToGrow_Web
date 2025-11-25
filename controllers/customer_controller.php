@@ -1,18 +1,17 @@
 <?php
 // controllers/customer_controller.php
 
-require_once __DIR__ . '/../models/customer_class.php';
-
+require_once __DIR__ . '/../models/customer_model.php';
 /**
  * Register a new customer.
  *
  * @param string $name
  * @param string $email
  * @param string $password  Plain-text password from form
- * @param string $role      Optional, defaults to 'customer'
+ * @param int $role         Optional, defaults to 2 (customer)
  * @return bool|int         false on failure, new user_id on success
  */
-function register_customer_ctr(string $name, string $email, string $password, string $role = 'customer')
+function register_customer_ctr(string $name, string $email, string $password, int $role = 2)
 {
     $customerModel = new CustomerModel();
 

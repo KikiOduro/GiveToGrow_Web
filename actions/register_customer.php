@@ -6,16 +6,23 @@ session_start();
 require_once __DIR__ . '/../controllers/customer_controller.php';
 
 // 1. Read POST input safely
-$name     = trim($_POST['name']     ?? '');
 $email    = trim($_POST['email']    ?? '');
 $password = trim($_POST['password'] ?? '');
 $confirm  = trim($_POST['confirm']  ?? '');
 
-// Default role
-$role = 'customer';
+// Generate a simple name from email (since there is no name field)
+$name = '';
+if ($email !== '') {
+    $localPart = strstr($email, '@', true) ?: $email;
+    $localPart = str_replace(['.', '_', '-'], ' ', $localPart);
+    $name      = ucwords($localPart);   // e.g. "abenaoduro1" → "Abenaoduro1"
+}
 
-// 2. Basic validation
-if ($name === '' || $email === '' || $password === '' || $confirm === '') {
+// Default role
+$role = 2;
+
+// 2. Basic validation (only require email, password, confirm)
+if ($email === '' || $password === '' || $confirm === '') {
     $_SESSION['register_error'] = "All fields are required.";
     header("Location: ../login/register.php");
     exit;
@@ -42,11 +49,8 @@ if ($existing) {
     exit;
 }
 
-// 4. Hash password
-$passwordHash = password_hash($password, PASSWORD_DEFAULT);
-
-// 5. Create user
-$user_id = register_customer_ctr($name, $email, $passwordHash, $role);
+// 4. Create user (controller hashes the password)
+$user_id = register_customer_ctr($name, $email, $password, $role);
 
 if (!$user_id) {
     $_SESSION['register_error'] = "Registration failed. Try again.";
@@ -54,12 +58,12 @@ if (!$user_id) {
     exit;
 }
 
-// 6. Auto-login user
+// 5. (Optional) auto-login user
 $_SESSION['user_id']    = $user_id;
 $_SESSION['user_name']  = $name;
 $_SESSION['user_email'] = $email;
 $_SESSION['user_role']  = $role;
 
-// 7. Redirect to dashboard or home
+// 6. Redirect to login page
 header("Location: ../login/login.php");
 exit;

@@ -20,10 +20,10 @@ class CustomerModel extends db_connection
      * @param string $name
      * @param string $email
      * @param string $passwordHash  password_hash() output
-     * @param string $role          'customer' or 'admin'
+     * @param int $role             2 for customer, 1 for admin
      * @return bool|int             false on failure, inserted id on success
      */
-    public function createCustomer(string $name, string $email, string $passwordHash, string $role = 'customer')
+    public function createCustomer(string $name, string $email, string $passwordHash, int $role = 2)
     {
         $sql = "INSERT INTO users (user_name, user_email, password_hash, user_role)
                 VALUES (?, ?, ?, ?)";
@@ -33,7 +33,7 @@ class CustomerModel extends db_connection
             return false;
         }
 
-        $stmt->bind_param('ssss', $name, $email, $passwordHash, $role);
+        $stmt->bind_param('sssi', $name, $email, $passwordHash, $role);
 
         if (!$stmt->execute()) {
             return false;

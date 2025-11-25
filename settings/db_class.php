@@ -86,19 +86,47 @@ if (!class_exists('db_connection')) {
 
         /**
          * Run a SELECT (or read) query; sets $this->results.
+         * Supports prepared statements with parameters.
          *
          * @param string $sqlQuery
+         * @param array $params Optional parameters for prepared statement
          * @return bool
          */
-        public function db_query($sqlQuery)
+        public function db_query($sqlQuery, $params = [])
         {
             if (!$this->ensure_connected()) return false;
 
-            $this->results = @mysqli_query($this->db, $sqlQuery);
-            if ($this->results === false) {
-                error_log('DB QUERY ERROR: ' . mysqli_error($this->db) . ' | SQL: ' . $sqlQuery);
+            // If no params, use regular query
+            if (empty($params)) {
+                $this->results = @mysqli_query($this->db, $sqlQuery);
+                if ($this->results === false) {
+                    error_log('DB QUERY ERROR: ' . mysqli_error($this->db) . ' | SQL: ' . $sqlQuery);
+                    return false;
+                }
+                return true;
+            }
+
+            // Use prepared statement
+            $stmt = $this->db->prepare($sqlQuery);
+            if (!$stmt) {
+                error_log('DB PREPARE ERROR: ' . $this->db->error . ' | SQL: ' . $sqlQuery);
                 return false;
             }
+
+            // Bind parameters dynamically
+            if (!empty($params)) {
+                $types = str_repeat('s', count($params)); // Default to string type
+                $stmt->bind_param($types, ...$params);
+            }
+
+            if (!$stmt->execute()) {
+                error_log('DB EXECUTE ERROR: ' . $stmt->error . ' | SQL: ' . $sqlQuery);
+                $stmt->close();
+                return false;
+            }
+
+            $this->results = $stmt->get_result();
+            $stmt->close();
             return true;
         }
 
@@ -122,25 +150,29 @@ if (!class_exists('db_connection')) {
 
         /**
          * Fetch one row from a SELECT.
+         * Supports prepared statements with parameters.
          *
          * @param string $sql
+         * @param array $params Optional parameters for prepared statement
          * @return array|false
          */
-        public function db_fetch_one($sql)
+        public function db_fetch_one($sql, $params = [])
         {
-            if (!$this->db_query($sql)) return false;
+            if (!$this->db_query($sql, $params)) return false;
             return mysqli_fetch_assoc($this->results);
         }
 
         /**
          * Fetch all rows from a SELECT.
+         * Supports prepared statements with parameters.
          *
          * @param string $sql
+         * @param array $params Optional parameters for prepared statement
          * @return array[]|false
          */
-        public function db_fetch_all($sql)
+        public function db_fetch_all($sql, $params = [])
         {
-            if (!$this->db_query($sql)) return false;
+            if (!$this->db_query($sql, $params)) return false;
             return mysqli_fetch_all($this->results, MYSQLI_ASSOC);
         }
 
