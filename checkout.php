@@ -64,7 +64,7 @@ $primary_school = $cart_items[0]['school_name'];
                     colors: {
                         "primary": "#A4B8A4",
                         "background-light": "#f7f7f7",
-                        "background-dark": "#181a18",
+                        "background-dark": "#1e293b",
                     },
                     fontFamily: {
                         "display": ["Lexend", "sans-serif"]

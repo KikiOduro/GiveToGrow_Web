@@ -34,7 +34,7 @@ $schools = $db->db_fetch_all("SELECT school_id, school_name, location FROM schoo
                     colors: {
                         "primary": "#A4B8A4",
                         "background-light": "#f7f7f7",
-                        "background-dark": "#181a18",
+                        "background-dark": "#1e293b",
                     },
                     fontFamily: {
                         "display": ["Lexend", "sans-serif"]
@@ -43,19 +43,8 @@ $schools = $db->db_fetch_all("SELECT school_id, school_name, location FROM schoo
             },
         }
         
-        function initTheme() {
-            const theme = localStorage.getItem('theme') || 'light';
-            document.documentElement.classList.toggle('dark', theme === 'dark');
-        }
-        
-        function toggleTheme() {
-            const html = document.documentElement;
-            const isDark = html.classList.contains('dark');
-            html.classList.toggle('dark');
-            localStorage.setItem('theme', isDark ? 'light' : 'dark');
-        }
-        
-        initTheme();
+        </script>
+    <style>
     </script>
     <style>
         .material-symbols-outlined {
@@ -114,11 +103,7 @@ $schools = $db->db_fetch_all("SELECT school_id, school_name, location FROM schoo
         
         <div class="p-4 border-t border-gray-200 dark:border-gray-700">
             <div class="flex items-center justify-between mb-3">
-                <span class="text-sm text-gray-600 dark:text-gray-400">Welcome, <strong><?php echo $admin_name; ?></strong></span>
-                <button onclick="toggleTheme()" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
-                    <span class="material-symbols-outlined dark:hidden text-xl">dark_mode</span>
-                    <span class="material-symbols-outlined hidden dark:inline text-xl">light_mode</span>
-                </button>
+                <span class="text-sm text-gray-600">Welcome, <strong><?php echo $admin_name; ?></strong></span>
             </div>
             <a href="../actions/logout.php" class="flex items-center justify-center gap-2 w-full px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
                 <span class="material-symbols-outlined text-xl">logout</span>

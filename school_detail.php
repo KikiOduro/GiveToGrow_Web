@@ -79,7 +79,7 @@ try {
                     colors: {
                         "primary": "#A4B8A4",
                         "background-light": "#f7f7f7",
-                        "background-dark": "#181a18",
+                        "background-dark": "#1e293b",
                     },
                     fontFamily: {
                         "display": ["Lexend", "sans-serif"]
@@ -165,10 +165,6 @@ try {
             <span class="text-sm font-medium text-neutral-800 dark:text-neutral-200">Verified School</span>
             <?php endif; ?>
         </div>
-        <button onclick="toggleTheme()" class="p-2 text-neutral-800 dark:text-neutral-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full">
-            <span class="material-symbols-outlined dark:hidden">dark_mode</span>
-            <span class="material-symbols-outlined hidden dark:inline">light_mode</span>
-        </button>
     </div>
     
     <!-- HeaderImage -->
@@ -212,6 +208,15 @@ try {
         </p>
     </div>
     
+    <!-- View Updates Button -->
+    <div class="px-8 py-3">
+        <a href="school_updates.php?id=<?php echo $school_id; ?>" 
+           class="flex items-center justify-center gap-2 bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary border-2 border-primary/30 rounded-lg px-6 py-3 font-bold hover:bg-primary/20 dark:hover:bg-primary/30 transition-colors">
+            <span class="material-symbols-outlined">insights</span>
+            View Updates & Impact
+        </a>
+    </div>
+    
     <!-- Verified Needs Section -->
     <div class="px-4 py-3">
         <h2 class="text-2xl font-bold text-neutral-800 dark:text-neutral-100 px-4 pb-4 pt-2">Help Fulfill Their Needs</h2>
@@ -244,6 +249,7 @@ try {
                         <?php echo htmlspecialchars($need['item_description']); ?>
                     </p>
                     <?php endif; ?>
+                    <?php if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin'): ?>
                     <div class="flex items-center gap-2 mt-3">
                         <a href="donate_item.php?id=<?php echo $need['need_id']; ?>" 
                            class="flex-grow px-4 py-2 text-sm font-bold text-white bg-primary rounded-full hover:bg-primary/90 transition-colors text-center">
@@ -254,6 +260,11 @@ try {
                             <span class="material-symbols-outlined">add_shopping_cart</span>
                         </button>
                     </div>
+                    <?php else: ?>
+                    <div class="mt-3 text-center">
+                        <p class="text-sm text-gray-500 dark:text-gray-400 italic">Admin view - Donation disabled</p>
+                    </div>
+                    <?php endif; ?>
                 </div>
             </div>
             <?php endforeach; ?>
@@ -265,7 +276,7 @@ try {
 </div>
 
 <!-- Persistent Footer -->
-<?php if ($cart_count > 0): ?>
+<?php if ($cart_count > 0 && (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin')): ?>
 <footer class="fixed bottom-0 left-0 right-0 z-20 bg-background-light dark:bg-neutral-900 border-t border-neutral-200 dark:border-neutral-700/50 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] dark:shadow-[0_-4px_12px_rgba(0,0,0,0.2)]">
     <div class="max-w-2xl mx-auto px-6 py-4 flex justify-between items-center">
         <div>

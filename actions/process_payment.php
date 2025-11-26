@@ -50,7 +50,7 @@ foreach ($cart_items as $item) {
     $total_amount += ($item['unit_price'] * $item['quantity']);
 }
 
-// TODO: Integrate with actual payment gateway (Stripe, PayPal, Mobile Money API)
+// TODO: Integrate with actual payment gateway (Paystack, PayPal, Mobile Money API)
 // For now, we'll simulate a successful payment
 
 // Begin transaction

@@ -1,7 +1,7 @@
 # GiveToGrow Admin System
 
 ## Overview
-Complete admin panel for managing schools and their needs on the GiveToGrow donation platform.
+Complete admin panel for managing schools and their needs on the GiveToGrow donation platform. The platform focuses on supporting under-resourced schools in Ghana.
 
 ## Features
 
@@ -12,11 +12,11 @@ Complete admin panel for managing schools and their needs on the GiveToGrow dona
 - Dark mode support
 
 ### 2. **Add School** (`admin/add_school.php`)
-- Form to register new underresourced schools
+- Form to register new underresourced schools in Ghana
 - Required fields:
   - School name
   - Location/City
-  - Country (dropdown with African countries)
+  - Region (text input for Ghanaian regions like Greater Accra, Ashanti, Northern, etc.)
   - Description
   - Image URL
   - Total students

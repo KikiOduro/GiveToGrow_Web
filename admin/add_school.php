@@ -28,7 +28,7 @@ unset($_SESSION['success_message'], $_SESSION['error_message']);
                     colors: {
                         "primary": "#A4B8A4",
                         "background-light": "#f7f7f7",
-                        "background-dark": "#181a18",
+                        "background-dark": "#1e293b",
                     },
                     fontFamily: {
                         "display": ["Lexend", "sans-serif"]
@@ -108,11 +108,7 @@ unset($_SESSION['success_message'], $_SESSION['error_message']);
         
         <div class="p-4 border-t border-gray-200 dark:border-gray-700">
             <div class="flex items-center justify-between mb-3">
-                <span class="text-sm text-gray-600 dark:text-gray-400">Welcome, <strong><?php echo $admin_name; ?></strong></span>
-                <button onclick="toggleTheme()" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
-                    <span class="material-symbols-outlined dark:hidden text-xl">dark_mode</span>
-                    <span class="material-symbols-outlined hidden dark:inline text-xl">light_mode</span>
-                </button>
+                <span class="text-sm text-gray-600">Welcome, <strong><?php echo $admin_name; ?></strong></span>
             </div>
             <a href="../actions/logout.php" class="flex items-center justify-center gap-2 w-full px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
                 <span class="material-symbols-outlined text-xl">logout</span>
@@ -160,7 +156,7 @@ unset($_SESSION['success_message'], $_SESSION['error_message']);
                                placeholder="e.g., Kibera Primary School"/>
                     </div>
                     
-                    <!-- Location & Country -->
+                    <!-- Location & Region -->
                     <div class="grid md:grid-cols-2 gap-6">
                         <div>
                             <label for="location" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -168,27 +164,16 @@ unset($_SESSION['success_message'], $_SESSION['error_message']);
                             </label>
                             <input type="text" id="location" name="location" required
                                    class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-[#131514] dark:text-background-light focus:ring-2 focus:ring-primary focus:border-transparent"
-                                   placeholder="e.g., Nairobi"/>
+                                   placeholder="e.g., Accra"/>
                         </div>
                         
                         <div>
                             <label for="country" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Country <span class="text-red-500">*</span>
+                                Region <span class="text-red-500">*</span>
                             </label>
-                            <select id="country" name="country" required
-                                    class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-[#131514] dark:text-background-light focus:ring-2 focus:ring-primary focus:border-transparent">
-                                <option value="">Select Country</option>
-                                <option value="Kenya">Kenya</option>
-                                <option value="Uganda">Uganda</option>
-                                <option value="Tanzania">Tanzania</option>
-                                <option value="Rwanda">Rwanda</option>
-                                <option value="Ghana">Ghana</option>
-                                <option value="Nigeria">Nigeria</option>
-                                <option value="Ethiopia">Ethiopia</option>
-                                <option value="Zambia">Zambia</option>
-                                <option value="Malawi">Malawi</option>
-                                <option value="Other">Other</option>
-                            </select>
+                            <input type="text" id="country" name="country" required
+                                   class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-[#131514] dark:text-background-light focus:ring-2 focus:ring-primary focus:border-transparent"
+                                   placeholder="e.g., Greater Accra, Ashanti, Northern, etc."/>
                         </div>
                     </div>
                     

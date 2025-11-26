@@ -19,20 +19,31 @@ $db = new db_connection();
 $category_filter = isset($_GET['category']) ? $_GET['category'] : '';
 $sort_by = isset($_GET['sort']) ? $_GET['sort'] : 'recent';
 
-// Determine sort order
+// Determine sort order based on selection
 $order_clause = 'ORDER BY s.created_at DESC'; // Default: Most Recent
 switch ($sort_by) {
-    case 'goal':
+    case 'recent':
+        // Most Recent - based on when school was added
+        $order_clause = 'ORDER BY s.created_at DESC';
+        break;
+    case 'goal_closest':
         // Closest to Goal (highest percentage funded)
-        $order_clause = 'ORDER BY (s.amount_raised / s.fundraising_goal) DESC';
+        $order_clause = 'ORDER BY (s.amount_raised / NULLIF(s.fundraising_goal, 0)) DESC';
         break;
-    case 'urgent':
-        // Most Urgent (lowest percentage funded)
-        $order_clause = 'ORDER BY (s.amount_raised / s.fundraising_goal) ASC';
-        break;
-    case 'amount':
-        // Highest Goal
+    case 'goal_highest':
+        // Highest Fundraising Goal
         $order_clause = 'ORDER BY s.fundraising_goal DESC';
+        break;
+    case 'priority':
+        // Most Urgent - based on priority of school needs (urgent > high > medium > low)
+        $order_clause = 'ORDER BY 
+            CASE 
+                WHEN MAX(sn.priority) = "urgent" THEN 1
+                WHEN MAX(sn.priority) = "high" THEN 2
+                WHEN MAX(sn.priority) = "medium" THEN 3
+                WHEN MAX(sn.priority) = "low" THEN 4
+                ELSE 5
+            END ASC, s.created_at DESC';
         break;
     default:
         $order_clause = 'ORDER BY s.created_at DESC';
@@ -40,13 +51,38 @@ switch ($sort_by) {
 
 // Build query based on filter
 if ($category_filter && $category_filter != 'all') {
-    $query = "SELECT DISTINCT s.* FROM schools s 
+    $query = "SELECT DISTINCT s.*, 
+              MAX(CASE 
+                WHEN sn.priority = 'urgent' THEN 1
+                WHEN sn.priority = 'high' THEN 2
+                WHEN sn.priority = 'medium' THEN 3
+                WHEN sn.priority = 'low' THEN 4
+                ELSE 5
+              END) as priority_rank
+              FROM schools s 
               JOIN school_needs sn ON s.school_id = sn.school_id 
               WHERE s.status = 'active' AND sn.item_category = ? 
+              GROUP BY s.school_id
               {$order_clause}";
     $schools = $db->db_fetch_all($query, [$category_filter]);
 } else {
-    $query = "SELECT * FROM schools s WHERE s.status = 'active' {$order_clause}";
+    if ($sort_by === 'priority') {
+        $query = "SELECT s.*, 
+                  MAX(CASE 
+                    WHEN sn.priority = 'urgent' THEN 1
+                    WHEN sn.priority = 'high' THEN 2
+                    WHEN sn.priority = 'medium' THEN 3
+                    WHEN sn.priority = 'low' THEN 4
+                    ELSE 5
+                  END) as priority_rank
+                  FROM schools s 
+                  LEFT JOIN school_needs sn ON s.school_id = sn.school_id
+                  WHERE s.status = 'active'
+                  GROUP BY s.school_id
+                  {$order_clause}";
+    } else {
+        $query = "SELECT s.* FROM schools s WHERE s.status = 'active' {$order_clause}";
+    }
     $schools = $db->db_fetch_all($query);
 }
 ?>
@@ -69,7 +105,7 @@ if ($category_filter && $category_filter != 'all') {
                     colors: {
                         "primary": "#A4B8A4",
                         "background-light": "#f7f7f7",
-                        "background-dark": "#181a18",
+                        "background-dark": "#1e293b",
                     },
                     fontFamily: {
                         "display": ["Lexend", "sans-serif"]
@@ -83,23 +119,6 @@ if ($category_filter && $category_filter != 'all') {
                 },
             },
         }
-    </script>
-    <script>
-        // Theme toggle functionality
-        function initTheme() {
-            const theme = localStorage.getItem('theme') || 'light';
-            document.documentElement.classList.toggle('dark', theme === 'dark');
-        }
-        
-        function toggleTheme() {
-            const html = document.documentElement;
-            const isDark = html.classList.contains('dark');
-            html.classList.toggle('dark');
-            localStorage.setItem('theme', isDark ? 'light' : 'dark');
-        }
-        
-        // Initialize theme on page load
-        initTheme();
     </script>
     <style>
         .material-symbols-outlined {
@@ -120,18 +139,14 @@ if ($category_filter && $category_filter != 'all') {
 </div>
 <div class="hidden lg:flex flex-1 justify-end gap-8">
     <nav class="flex items-center gap-9">
-        <a class="text-[#131514] dark:text-background-light text-sm font-medium leading-normal hover:text-primary dark:hover:text-primary" href="dashboard.php#how-it-works">How it works</a>
+        <a class="text-[#131514] dark:text-background-light text-sm font-medium leading-normal hover:text-primary dark:hover:text-primary" href="dashboard.php">Back Home</a>
         <a class="text-primary text-sm font-bold leading-normal" href="schools.php">Schools</a>
-        <a class="text-[#131514] dark:text-background-light text-sm font-medium leading-normal hover:text-primary dark:hover:text-primary" href="dashboard.php#about">About</a>
+        <a class="text-[#131514] dark:text-background-light text-sm font-medium leading-normal hover:text-primary dark:hover:text-primary" href="about.php">About</a>
         <a class="text-[#131514] dark:text-background-light text-sm font-medium leading-normal hover:text-primary dark:hover:text-primary" href="dashboard.php#contact">Contact</a>
     </nav>
     <div class="flex gap-2 items-center">
-        <span class="text-sm text-[#131514] dark:text-background-light">Welcome, <strong><?php echo $user_name; ?></strong></span>
-        <button onclick="toggleTheme()" class="flex items-center justify-center h-10 w-10 rounded-full bg-primary/20 text-primary dark:bg-primary/30 dark:text-background-light hover:bg-primary/30 dark:hover:bg-primary/40">
-            <span class="material-symbols-outlined dark:hidden">dark_mode</span>
-            <span class="material-symbols-outlined hidden dark:inline">light_mode</span>
-        </button>
-        <a href="actions/logout.php" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-background-light dark:bg-primary/20 text-[#131514] dark:text-background-light text-sm font-bold leading-normal tracking-[0.015em] border border-primary/20 dark:border-primary/50 hover:bg-primary/10 dark:hover:bg-primary/30">
+        <span class="text-sm text-[#131514]">Welcome, <strong><?php echo $user_name; ?></strong></span>
+        <a href="actions/logout.php" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-background-light text-[#131514] text-sm font-bold leading-normal tracking-[0.015em] border border-primary/20 hover:bg-primary/10">
             <span class="truncate">Log Out</span>
         </a>
     </div>
@@ -151,7 +166,7 @@ if ($category_filter && $category_filter != 'all') {
             Browse Schools
         </h1>
         <p class="mt-4 text-gray-600 dark:text-gray-300 text-lg font-normal leading-normal max-w-2xl mx-auto">
-            Discover schools across Africa where your contribution can make a real difference. Each project is vetted and transparent.
+            Discover schools across Ghana where your contribution can make a real difference. Each project is vetted and transparent.
         </p>
     </div>
     
@@ -187,9 +202,9 @@ if ($category_filter && $category_filter != 'all') {
             <label for="sort" class="text-sm text-gray-600 dark:text-gray-400">Sort by:</label>
             <select id="sort" onchange="sortSchools(this.value)" class="rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-[#131514] dark:text-background-light px-4 py-2 text-sm">
                 <option value="recent" <?php echo $sort_by === 'recent' ? 'selected' : ''; ?>>Most Recent</option>
-                <option value="goal" <?php echo $sort_by === 'goal' ? 'selected' : ''; ?>>Closest to Goal</option>
-                <option value="urgent" <?php echo $sort_by === 'urgent' ? 'selected' : ''; ?>>Most Urgent</option>
-                <option value="amount" <?php echo $sort_by === 'amount' ? 'selected' : ''; ?>>Highest Goal</option>
+                <option value="priority" <?php echo $sort_by === 'priority' ? 'selected' : ''; ?>>Most Urgent (Priority)</option>
+                <option value="goal_highest" <?php echo $sort_by === 'goal_highest' ? 'selected' : ''; ?>>Highest Goal</option>
+                <option value="goal_closest" <?php echo $sort_by === 'goal_closest' ? 'selected' : ''; ?>>Closest to Goal</option>
             </select>
         </div>
         <script>
@@ -238,9 +253,11 @@ if ($category_filter && $category_filter != 'all') {
                 </div>
                 <div class="flex gap-2 mt-auto">
                     <a href="school_detail.php?id=<?php echo $school['school_id']; ?>" class="flex-1 flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-primary/20 text-primary dark:bg-primary/30 dark:text-background-light text-sm font-bold leading-normal tracking-[0.015em] hover:bg-primary/30 dark:hover:bg-primary/40">View School</a>
+                    <?php if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin'): ?>
                     <button class="flex-shrink-0 flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-opacity-90">
                         <span class="material-symbols-outlined text-xl">add_shopping_cart</span>
                     </button>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -261,13 +278,12 @@ if ($category_filter && $category_filter != 'all') {
         </div>
         <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Connecting generosity with classrooms in need.</p>
     </div>
-                </div>
     <div>
         <h3 class="text-sm font-semibold text-gray-900 dark:text-white tracking-wider uppercase">Quick Links</h3>
         <ul class="mt-4 space-y-4">
             <li><a class="text-base text-gray-500 dark:text-gray-400 hover:text-primary" href="dashboard.php#how-it-works">How it Works</a></li>
             <li><a class="text-base text-gray-500 dark:text-gray-400 hover:text-primary" href="schools.php">Our Schools</a></li>
-            <li><a class="text-base text-gray-500 dark:text-gray-400 hover:text-primary" href="dashboard.php#about">About Us</a></li>
+            <li><a class="text-base text-gray-500 dark:text-gray-400 hover:text-primary" href="about.php">About Us</a></li>
         </ul>
     </div>
     <div>
@@ -280,7 +296,17 @@ if ($category_filter && $category_filter != 'all') {
     </div>
     <div>
         <h3 class="text-sm font-semibold text-gray-900 dark:text-white tracking-wider uppercase">Connect</h3>
-        <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">Payments are securely processed by Stripe.</p>
+        <ul class="mt-4 space-y-3">
+            <li class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                <span class="material-symbols-outlined text-lg">language</span>
+                <a href="https://givetogrow.com" class="hover:text-primary">Givetogrow.com</a>
+            </li>
+            <li class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                <span class="material-symbols-outlined text-lg">phone</span>
+                <a href="tel:+233557663220" class="hover:text-primary">055 766 3220</a>
+            </li>
+        </ul>
+        <p class="mt-4 text-xs text-gray-500 dark:text-gray-400">Payments are securely processed by Paystack.</p>
     </div>
 </div>
 <div class="mt-8 border-t border-gray-200 dark:border-gray-700 pt-8 text-center">

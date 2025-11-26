@@ -9,6 +9,37 @@ if (!isset($_SESSION['user_id'])) {
 
 // Get user information from session
 $user_name = isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : 'User';
+
+// Fetch impact statistics from database
+require_once 'settings/db_class.php';
+$db = new db_connection();
+
+// Total students reached
+$students_query = "SELECT SUM(total_students) as total_students FROM schools WHERE status = 'active'";
+$students_result = $db->db_fetch_one($students_query);
+$total_students = $students_result['total_students'] ?? 0;
+
+// Total partner schools
+$schools_query = "SELECT COUNT(*) as total_schools FROM schools WHERE status = 'active'";
+$schools_result = $db->db_fetch_one($schools_query);
+$total_schools = $schools_result['total_schools'] ?? 0;
+
+// Total regions (count distinct regions from country field)
+$regions_query = "SELECT COUNT(DISTINCT country) as total_regions FROM schools WHERE status = 'active'";
+$regions_result = $db->db_fetch_one($regions_query);
+$total_regions = $regions_result['total_regions'] ?? 0;
+
+// Total amount donated (sum of amount_raised from all schools)
+$donated_query = "SELECT SUM(amount_raised) as total_donated FROM schools";
+$donated_result = $db->db_fetch_one($donated_query);
+$total_donated = $donated_result['total_donated'] ?? 0;
+
+// Format the donation amount
+if ($total_donated >= 1000) {
+    $donated_display = '$' . number_format($total_donated / 1000, 0) . 'K+';
+} else {
+    $donated_display = '$' . number_format($total_donated, 0) . '+';
+}
 ?>
 <!DOCTYPE html>
 <html class="light" lang="en">
@@ -29,7 +60,7 @@ $user_name = isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_na
                     colors: {
                         "primary": "#A4B8A4",
                         "background-light": "#f7f7f7",
-                        "background-dark": "#181a18",
+                        "background-dark": "#1e293b",
                     },
                     fontFamily: {
                         "display": ["Lexend", "sans-serif"]
@@ -44,21 +75,8 @@ $user_name = isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_na
             },
         }
         
-        // Theme toggle functionality
-        function initTheme() {
-            const theme = localStorage.getItem('theme') || 'light';
-            document.documentElement.classList.toggle('dark', theme === 'dark');
-        }
-        
-        function toggleTheme() {
-            const html = document.documentElement;
-            const isDark = html.classList.contains('dark');
-            html.classList.toggle('dark');
-            localStorage.setItem('theme', isDark ? 'light' : 'dark');
-        }
-        
-        // Initialize theme on page load
-        initTheme();
+        </script>
+    <style>
     </script>
     <style>
         .material-symbols-outlined {
@@ -85,12 +103,8 @@ $user_name = isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_na
                 <a class="text-[#131514] dark:text-background-light text-sm font-medium leading-normal hover:text-primary dark:hover:text-primary" href="#contact">Contact</a>
             </nav>
             <div class="flex gap-2 items-center">
-                <span class="text-sm text-[#131514] dark:text-background-light">Welcome, <strong><?php echo $user_name; ?></strong></span>
-                <button onclick="toggleTheme()" class="flex items-center justify-center h-10 w-10 rounded-full bg-primary/20 text-primary dark:bg-primary/30 dark:text-background-light hover:bg-primary/30 dark:hover:bg-primary/40">
-                    <span class="material-symbols-outlined dark:hidden">dark_mode</span>
-                    <span class="material-symbols-outlined hidden dark:inline">light_mode</span>
-                </button>
-                <a href="actions/logout.php" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-background-light dark:bg-primary/20 text-[#131514] dark:text-background-light text-sm font-bold leading-normal tracking-[0.015em] border border-primary/20 dark:border-primary/50 hover:bg-primary/10 dark:hover:bg-primary/30">
+                <span class="text-sm text-[#131514]\">Welcome, <strong><?php echo $user_name; ?></strong></span>
+                <a href="actions/logout.php" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-background-light text-[#131514] text-sm font-bold leading-normal tracking-[0.015em] border border-primary/20 hover:bg-primary/10">
                     <span class="truncate">Log Out</span>
                 </a>
             </div>
@@ -112,7 +126,7 @@ $user_name = isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_na
                 About GiveToGrow
             </h1>
             <p class="text-gray-600 dark:text-gray-300 text-lg sm:text-xl leading-relaxed max-w-3xl mx-auto">
-                We're on a mission to bridge the education gap in Africa by connecting generous donors directly with schools that need resources the most.
+                We're on a mission to bridge the education gap in Ghana by connecting generous donors directly with schools that need resources the most.
             </p>
         </div>
     </section>
@@ -127,7 +141,7 @@ $user_name = isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_na
                     </h2>
                     <div class="space-y-4 text-gray-600 dark:text-gray-300">
                         <p>
-                            GiveToGrow was founded in 2023 with a simple yet powerful vision: to ensure that every child in Africa has access to quality education, regardless of their economic circumstances.
+                            GiveToGrow was founded in 2023 with a simple yet powerful vision: to ensure that every child in Ghana has access to quality education, regardless of their economic circumstances.
                         </p>
                         <p>
                             We recognized that many schools across the continent lack basic resources – from textbooks and desks to clean water and technology. While these needs are critical, connecting donors with the right schools remained a challenge.
@@ -138,9 +152,9 @@ $user_name = isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_na
                     </div>
                 </div>
                 <div class="rounded-xl overflow-hidden shadow-lg">
-                    <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBVFzqJcKl-TbWfa1_ZZeK6tYZYBJc6thvqIwgfsTRLq-byXkWQITBj5OIqaN8h01AMG4L89RKTBzG12B5tiN1SonTClS6IMvNZrEcL1AH7UjUIhYyCXIbchdlX-nJqrNwKjcT7EgTZKjLxMZU420nPzJe6jHKPffmWfdKK_4E_mwPELmLM72f-CsS8zQU9rppDXh8x1naWB5QuKEdwnYbC8inI330ucAJJ8IC3Q6GXg12g0yvA7DIrlLjqY0uVmnrzrSYWra3cREUt" 
-                         alt="African students in classroom" 
-                         class="w-full h-full object-cover"/>
+                    <img src="https://www.happyghana.com/wp-content/uploads/2025/06/school-children.jpg" 
+                         alt="Ghanaian students in classroom" 
+                         class="w-full h-full object-cover rounded-2xl shadow-xl"/>
                 </div>
             </div>
         </div>
@@ -192,19 +206,19 @@ $user_name = isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_na
             </h2>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
                 <div class="text-center">
-                    <div class="text-5xl font-black text-primary mb-3">12,000+</div>
+                    <div class="text-5xl font-black text-primary mb-3"><?php echo number_format($total_students); ?>+</div>
                     <div class="text-gray-600 dark:text-gray-300 text-sm font-medium">Students Reached</div>
                 </div>
                 <div class="text-center">
-                    <div class="text-5xl font-black text-primary mb-3">85</div>
+                    <div class="text-5xl font-black text-primary mb-3"><?php echo $total_schools; ?></div>
                     <div class="text-gray-600 dark:text-gray-300 text-sm font-medium">Partner Schools</div>
                 </div>
                 <div class="text-center">
-                    <div class="text-5xl font-black text-primary mb-3">6</div>
-                    <div class="text-gray-600 dark:text-gray-300 text-sm font-medium">Countries</div>
+                    <div class="text-5xl font-black text-primary mb-3"><?php echo $total_regions; ?></div>
+                    <div class="text-gray-600 dark:text-gray-300 text-sm font-medium">Regions</div>
                 </div>
                 <div class="text-center">
-                    <div class="text-5xl font-black text-primary mb-3">$250K+</div>
+                    <div class="text-5xl font-black text-primary mb-3"><?php echo $donated_display; ?></div>
                     <div class="text-gray-600 dark:text-gray-300 text-sm font-medium">Donated</div>
                 </div>
             </div>
@@ -321,7 +335,7 @@ $user_name = isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_na
                 <a href="schools.php" class="flex min-w-[160px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-6 bg-primary text-white text-base font-bold leading-normal tracking-[0.015em] hover:bg-opacity-90 transition-all">
                     Browse Schools
                 </a>
-                <a href="mailto:info@givetogrow.org" class="flex min-w-[160px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-6 bg-white dark:bg-gray-800 text-[#131514] dark:text-background-light text-base font-bold leading-normal tracking-[0.015em] border-2 border-primary hover:bg-primary/10 dark:hover:bg-primary/20 transition-all">
+                <a href="dashboard.php#contact" class="flex min-w-[160px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-6 bg-white dark:bg-gray-800 text-[#131514] dark:text-background-light text-base font-bold leading-normal tracking-[0.015em] border-2 border-primary hover:bg-primary/10 dark:hover:bg-primary/20 transition-all">
                     Contact Us
                 </a>
             </div>
