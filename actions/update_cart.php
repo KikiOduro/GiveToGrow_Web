@@ -54,9 +54,13 @@ switch ($action) {
             }
         }
         
-        // Update quantity
+        // Update quantity using prepared statement
+        $conn = $db->db_conn();
         $update_query = "UPDATE cart SET quantity = ? WHERE cart_id = ?";
-        $result = $db->db_query($update_query, [$new_quantity, $cart_id]);
+        $stmt = $conn->prepare($update_query);
+        $stmt->bind_param('ii', $new_quantity, $cart_id);
+        $result = $stmt->execute();
+        $stmt->close();
         
         if ($result) {
             echo json_encode(['success' => true, 'message' => 'Quantity updated successfully']);
@@ -66,9 +70,13 @@ switch ($action) {
         break;
         
     case 'remove':
-        // Delete the item from cart
+        // Delete the item from cart using prepared statement
+        $conn = $db->db_conn();
         $delete_query = "DELETE FROM cart WHERE cart_id = ?";
-        $result = $db->db_query($delete_query, [$cart_id]);
+        $stmt = $conn->prepare($delete_query);
+        $stmt->bind_param('i', $cart_id);
+        $result = $stmt->execute();
+        $stmt->close();
         
         if ($result) {
             echo json_encode(['success' => true, 'message' => 'Item removed from cart']);
