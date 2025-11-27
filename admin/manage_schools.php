@@ -185,7 +185,7 @@ $schools = $db->db_fetch_all($query);
                                 </td>
                                 <td class="px-6 py-4 text-sm">
                                     <div class="flex gap-2">
-                                        <a href="../school_detail.php?id=<?php echo $school['school_id']; ?>" 
+                                        <a href="../views/school_detail.php?id=<?php echo $school['school_id']; ?>" 
                                            class="text-blue-600 hover:text-blue-800 dark:text-blue-400" title="View">
                                             <span class="material-symbols-outlined text-xl">visibility</span>
                                         </a>
