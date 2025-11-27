@@ -223,7 +223,7 @@ $recent_schools = $db->db_fetch_all("SELECT * FROM schools ORDER BY created_at D
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm">
                                     <a href="add_need.php?school_id=<?php echo $school['school_id']; ?>" class="text-primary hover:text-primary/80 mr-3">Add Need</a>
-                                    <a href="../school_detail.php?id=<?php echo $school['school_id']; ?>" class="text-blue-600 hover:text-blue-800">View</a>
+                                    <a href="../views/school_detail.php?id=<?php echo $school['school_id']; ?>" class="text-blue-600 hover:text-blue-800">View</a>
                                 </td>
                             </tr>
                             <?php endforeach; ?>
