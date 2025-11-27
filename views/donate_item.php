@@ -70,14 +70,14 @@ $remaining = $need['quantity_needed'] - $quantity_fulfilled;
             },
         }
         
-        // Theme toggle functionality
-        function initTheme() {
-            const theme = localStorage.getItem('theme') || 'light';
-            document.documentElement.classList.toggle('dark', theme === 'dark');
-        }
+        // // Theme toggle functionality
+        // function initTheme() {
+        //     const theme = localStorage.getItem('theme') || 'light';
+        //     document.documentElement.classList.toggle('dark', theme === 'dark');
+        // }
         
-        // Initialize theme on page load
-        initTheme();
+        // // Initialize theme on page load
+        // initTheme();
     </script>
     <style>
         .material-symbols-outlined {
@@ -265,7 +265,7 @@ document.getElementById('donationForm').addEventListener('submit', function(e) {
     
     const formData = new FormData(this);
     
-    fetch('actions/add_to_cart.php', {
+    fetch('../actions/add_to_cart.php', {
         method: 'POST',
         body: formData
     })

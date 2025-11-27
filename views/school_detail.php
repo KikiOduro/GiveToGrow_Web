@@ -108,7 +108,7 @@ try {
 
         // Add to cart function
         function addToCart(needId) {
-            fetch('actions/add_to_cart.php', {
+            fetch('../actions/add_to_cart.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
