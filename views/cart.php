@@ -3,7 +3,7 @@ session_start();
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login/login.php");
+    header("Location: ../login/login.php");
     exit();
 }
 
@@ -97,7 +97,7 @@ $total = $subtotal + $processing_fee;
     <!-- Header -->
     <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-[#e0e0e0] dark:border-neutral-700 px-0 md:px-10 py-4">
         <div class="flex items-center gap-3 text-primary">
-            <img src="assets/logo.png" alt="GiveToGrow Logo" class="h-8 w-auto"/>
+            <img src="../assets/logo.png" alt="GiveToGrow Logo" class="h-8 w-auto"/>
             <h2 class="text-[#333333] dark:text-neutral-100 text-xl font-bold">GiveToGrow</h2>
         </div>
         <a href="schools.php" class="flex cursor-pointer items-center justify-center rounded-lg h-10 bg-neutral-100 dark:bg-neutral-800 text-[#333333] dark:text-neutral-200 gap-2 text-sm font-bold min-w-10 px-2.5 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors">

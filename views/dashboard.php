@@ -3,7 +3,7 @@ session_start();
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login/login.php");
+    header("Location: ../login/login.php");
     exit();
 }
 
@@ -159,7 +159,7 @@ try {
 <header class="sticky top-0 z-50 flex justify-center border-b border-solid border-black/10 dark:border-white/10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm">
 <div class="flex items-center justify-between whitespace-nowrap px-4 sm:px-10 py-3 w-full max-w-6xl">
 <div class="flex items-center gap-4 text-[#131514] dark:text-background-light">
-    <img src="assets/logo.png" alt="GiveToGrow Logo" class="h-8 w-auto"/>
+    <img src="../assets/logo.png" alt="GiveToGrow Logo" class="h-8 w-auto"/>
     <h2 class="text-[#131514] dark:text-background-light text-lg font-bold leading-tight tracking-[-0.015em]">GiveToGrow</h2>
 </div>
 <div class="hidden lg:flex flex-1 justify-end gap-8">
@@ -169,12 +169,12 @@ try {
                 <a class="text-[#131514] dark:text-background-light text-sm font-medium leading-normal hover:text-primary dark:hover:text-primary" href="about.php">About</a>
                 <a class="text-[#131514] dark:text-background-light text-sm font-medium leading-normal hover:text-primary dark:hover:text-primary" href="#contact">Contact</a>
                 <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
-                <a class="text-primary text-sm font-bold leading-normal border border-primary rounded-full px-4 py-2 hover:bg-primary/10" href="admin/dashboard.php">Admin Panel</a>
+                <a class="text-primary text-sm font-bold leading-normal border border-primary rounded-full px-4 py-2 hover:bg-primary/10" href="../admin/dashboard.php">Admin Panel</a>
                 <?php endif; ?>
             </nav>
     <div class="flex gap-2 items-center">
         <span class="text-sm text-[#131514]">Welcome, <strong><?php echo $user_name; ?></strong></span>
-        <a href="actions/logout.php" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-background-light text-[#131514] text-sm font-bold leading-normal tracking-[0.015em] border border-primary/20 hover:bg-primary/10">
+        <a href="../actions/logout.php" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-background-light text-[#131514] text-sm font-bold leading-normal tracking-[0.015em] border border-primary/20 hover:bg-primary/10">
             <span class="truncate">Log Out</span>
         </a>
     </div>
@@ -363,7 +363,7 @@ try {
     <div class="text-center py-12">
         <p class="text-gray-600 dark:text-gray-300 text-lg">No schools available at the moment. Check back soon!</p>
         <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
-            <a href="admin/add_school.php" class="inline-block mt-4 px-6 py-2 bg-primary text-white rounded-full font-bold hover:bg-opacity-90">Add Your First School</a>
+            <a href="../admin/add_school.php" class="inline-block mt-4 px-6 py-2 bg-primary text-white rounded-full font-bold hover:bg-opacity-90">Add Your First School</a>
         <?php endif; ?>
     </div>
 <?php else: ?>
@@ -475,7 +475,7 @@ try {
 <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
     <div class="col-span-2 md:col-span-1">
         <div class="flex items-center gap-2 text-[#131514] dark:text-background-light">
-            <img src="assets/logo.png" alt="GiveToGrow Logo" class="h-6 w-auto"/>
+            <img src="../assets/logo.png" alt="GiveToGrow Logo" class="h-6 w-auto"/>
             <h2 class="text-lg font-bold">GiveToGrow</h2>
         </div>
         <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Connecting generosity with classrooms in need.</p>

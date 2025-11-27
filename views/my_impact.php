@@ -3,7 +3,7 @@ session_start();
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login/login.php");
+    header("Location: ../login/login.php");
     exit();
 }
 
@@ -137,7 +137,7 @@ $donation_history = $db->db_fetch_all($history_query, [$user_id]);
             <div class="flex h-full flex-col justify-between">
                 <div class="flex flex-col gap-8">
                     <div class="flex items-center gap-2 px-2">
-                        <img src="assets/logo.png" alt="GiveToGrow Logo" class="h-8 w-auto"/>
+                        <img src="../assets/logo.png" alt="GiveToGrow Logo" class="h-8 w-auto"/>
                         <h1 class="text-[#131514] dark:text-background-light text-xl font-bold">GiveToGrow</h1>
                     </div>
                     <div class="flex flex-col gap-4">
@@ -172,12 +172,12 @@ $donation_history = $db->db_fetch_all($history_query, [$user_id]);
                     </a>
                     <div class="flex flex-col gap-1 border-t border-black/10 dark:border-white/10 pt-2">
                         <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
-                        <a class="flex items-center gap-3 px-3 py-2 text-[#131514] dark:text-gray-300 hover:bg-primary/10 dark:hover:bg-primary/20 rounded-lg" href="admin/index.php">
+                        <a class="flex items-center gap-3 px-3 py-2 text-[#131514] dark:text-gray-300 hover:bg-primary/10 dark:hover:bg-primary/20 rounded-lg" href="../admin/index.php">
                             <span class="material-symbols-outlined">admin_panel_settings</span>
                             <p class="text-sm font-medium leading-normal">Admin Panel</p>
                         </a>
                         <?php endif; ?>
-                        <a class="flex items-center gap-3 px-3 py-2 text-[#131514] dark:text-gray-300 hover:bg-primary/10 dark:hover:bg-primary/20 rounded-lg" href="actions/logout.php">
+                        <a class="flex items-center gap-3 px-3 py-2 text-[#131514] dark:text-gray-300 hover:bg-primary/10 dark:hover:bg-primary/20 rounded-lg" href="../actions/logout.php">
                             <span class="material-symbols-outlined">logout</span>
                             <p class="text-sm font-medium leading-normal">Log Out</p>
                         </a>

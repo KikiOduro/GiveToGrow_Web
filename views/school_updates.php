@@ -3,7 +3,7 @@ session_start();
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login/login.php");
+    header("Location: ../login/login.php");
     exit();
 }
 
@@ -94,13 +94,13 @@ $user_name = isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_na
     <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-sm border-b border-gray-200">
         <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center gap-4">
-                <img src="assets/logo.png" alt="GiveToGrow Logo" class="h-8 w-auto"/>
+                <img src="../assets/logo.png" alt="GiveToGrow Logo" class="h-8 w-auto"/>
                 <h2 class="text-lg font-bold">GiveToGrow</h2>
             </div>
             <div class="flex items-center gap-4">
                 <a href="schools.php" class="text-sm font-medium hover:text-primary">Back to Schools</a>
                 <span class="text-sm">Welcome, <strong><?php echo $user_name; ?></strong></span>
-                <a href="actions/logout.php" class="px-4 py-2 bg-primary text-white rounded-full text-sm font-bold hover:opacity-90">Log Out</a>
+                <a href="../actions/logout.php" class="px-4 py-2 bg-primary text-white rounded-full text-sm font-bold hover:opacity-90">Log Out</a>
             </div>
         </div>
     </header>

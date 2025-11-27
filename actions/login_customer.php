@@ -51,7 +51,7 @@ if ($result && password_verify($password, $result['password_hash'])) {
     $_SESSION['logged_in']  = true;
 
     // Send them to their dashboard - they're officially logged in!
-    header('Location: ../dashboard.php');
+    header('Location: ../views/dashboard.php');
     exit;
 }
 

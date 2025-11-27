@@ -3,7 +3,7 @@ session_start();
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login/login.php");
+    header("Location: ../login/login.php");
     exit();
 }
 
@@ -93,7 +93,7 @@ $remaining = $need['quantity_needed'] - $quantity_fulfilled;
 <!-- TopNavBar -->
 <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark px-4 sm:px-10 py-3 fixed top-0 left-0 right-0 z-10">
     <div class="flex items-center gap-3 text-primary">
-        <img src="assets/logo.png" alt="GiveToGrow Logo" class="h-8 w-auto"/>
+        <img src="../assets/logo.png" alt="GiveToGrow Logo" class="h-8 w-auto"/>
         <h2 class="text-[#333333] dark:text-gray-200 text-lg font-bold leading-tight tracking-[-0.015em]">GiveToGrow</h2>
     </div>
     <a href="cart.php" class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-10 px-2.5">

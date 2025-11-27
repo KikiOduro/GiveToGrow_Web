@@ -3,7 +3,7 @@ session_start();
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login/login.php");
+    header("Location: ../login/login.php");
     exit();
 }
 
@@ -105,7 +105,7 @@ $primary_school = $cart_items[0]['school_name'];
     <!-- Header -->
     <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-neutral-200 dark:border-neutral-800 px-4 sm:px-10 py-3 fixed w-full top-0 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm z-50">
         <div class="flex items-center gap-3">
-            <img src="assets/logo.png" alt="GiveToGrow Logo" class="h-8 w-auto"/>
+            <img src="../assets/logo.png" alt="GiveToGrow Logo" class="h-8 w-auto"/>
             <h1 class="text-[#131514] dark:text-neutral-100 text-lg font-bold leading-tight tracking-[-0.015em]">GiveToGrow</h1>
         </div>
         <button class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 bg-neutral-200 dark:bg-neutral-800 text-[#131514] dark:text-neutral-200">
