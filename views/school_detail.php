@@ -118,8 +118,8 @@ try {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Update cart display
-                    location.reload();
+                    // Show success modal with options
+                    showAddToCartModal();
                 } else {
                     alert(data.message || 'Failed to add item to cart');
                 }
@@ -128,6 +128,24 @@ try {
                 console.error('Error:', error);
                 alert('An error occurred. Please try again.');
             });
+        }
+
+        // Show modal after adding to cart
+        function showAddToCartModal() {
+            const modal = document.getElementById('addToCartModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+        }
+
+        // Close modal
+        function closeModal() {
+            const modal = document.getElementById('addToCartModal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
         }
 
         // Quick donate function
@@ -293,6 +311,28 @@ try {
     </div>
 </footer>
 <?php endif; ?>
+
+<!-- Add to Cart Success Modal -->
+<div id="addToCartModal" class="hidden fixed inset-0 z-50 items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div class="bg-white dark:bg-neutral-800 rounded-2xl shadow-2xl max-w-md w-full mx-4 p-6 transform transition-all">
+        <div class="text-center">
+            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 dark:bg-green-900/30 mb-4">
+                <span class="material-symbols-outlined text-green-600 dark:text-green-400 text-3xl">check_circle</span>
+            </div>
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Added to Cart!</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-300 mb-6">Item has been added to your cart successfully.</p>
+            <div class="flex flex-col gap-3">
+                <a href="cart.php" class="w-full bg-primary text-white font-bold py-3 px-6 rounded-full hover:bg-primary/90 transition-colors">
+                    View Cart
+                </a>
+                <a href="schools.php" class="w-full bg-gray-200 dark:bg-neutral-700 text-gray-800 dark:text-white font-semibold py-3 px-6 rounded-full hover:bg-gray-300 dark:hover:bg-neutral-600 transition-colors">
+                    Continue Browsing
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
 </div>
 </body>
 </html>

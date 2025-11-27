@@ -145,8 +145,12 @@ if ($category_filter && $category_filter != 'all') {
         <a class="text-[#131514] dark:text-background-light text-sm font-medium leading-normal hover:text-primary dark:hover:text-primary" href="dashboard.php#contact">Contact</a>
     </nav>
     <div class="flex gap-2 items-center">
-        <span class="text-sm text-[#131514]">Welcome, <strong><?php echo $user_name; ?></strong></span>
-        <a href="../actions/logout.php" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-background-light text-[#131514] text-sm font-bold leading-normal tracking-[0.015em] border border-primary/20 hover:bg-primary/10">
+        <a href="cart.php" class="relative flex items-center justify-center h-10 w-10 rounded-full hover:bg-primary/10 transition-colors">
+            <span class="material-symbols-outlined text-[#131514] dark:text-background-light">shopping_cart</span>
+            <span id="cart-count" class="absolute -top-1 -right-1 bg-primary text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span>
+        </a>
+        <span class="text-sm text-[#131514] dark:text-background-light">Welcome, <strong><?php echo $user_name; ?></strong></span>
+        <a href="../actions/logout.php" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-background-light dark:bg-background-dark text-[#131514] dark:text-background-light text-sm font-bold leading-normal tracking-[0.015em] border border-primary/20 hover:bg-primary/10">
             <span class="truncate">Log Out</span>
         </a>
     </div>
@@ -316,5 +320,27 @@ if ($category_filter && $category_filter != 'all') {
 </footer>
 </div>
 </div>
+
+<script>
+// Fetch cart count on page load
+function updateCartCount() {
+    fetch('../actions/get_cart_count.php')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const cartCount = document.getElementById('cart-count');
+                if (cartCount) {
+                    cartCount.textContent = data.count;
+                    cartCount.style.display = data.count > 0 ? 'flex' : 'none';
+                }
+            }
+        })
+        .catch(error => console.error('Error fetching cart count:', error));
+}
+
+// Update cart count on page load
+updateCartCount();
+</script>
+
 </body>
 </html>
