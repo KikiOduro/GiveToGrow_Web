@@ -42,22 +42,39 @@ try {
     $cart_check = "SELECT * FROM cart WHERE user_id = ? AND need_id = ?";
     $existing = $db->db_fetch_one($cart_check, [$user_id, $need_id]);
 
+    $conn = $db->db_conn();
+    
     if ($existing) {
-        // Update quantity
-        $update_query = "UPDATE cart SET quantity = quantity + ? WHERE user_id = ? AND need_id = ?";
-        $result = $db->db_query($update_query, [$quantity, $user_id, $need_id]);
-        error_log("Updated cart - Cart ID: {$existing['cart_id']}, New total quantity");
+        // Update quantity using prepared statement
+        $new_quantity = $existing['quantity'] + $quantity;
+        $update_query = "UPDATE cart SET quantity = ? WHERE cart_id = ?";
+        $stmt = $conn->prepare($update_query);
+        $stmt->bind_param('ii', $new_quantity, $existing['cart_id']);
+        $result = $stmt->execute();
+        $stmt->close();
+        error_log("Updated cart - Cart ID: {$existing['cart_id']}, New quantity: $new_quantity");
     } else {
-        // Insert new cart item
+        // Insert new cart item using prepared statement
         $insert_query = "INSERT INTO cart (user_id, need_id, quantity) VALUES (?, ?, ?)";
-        $result = $db->db_query($insert_query, [$user_id, $need_id, $quantity]);
-        error_log("Inserted new cart item - User: $user_id, Need: $need_id");
+        $stmt = $conn->prepare($insert_query);
+        
+        if (!$stmt) {
+            error_log("Failed to prepare statement: " . $conn->error);
+            echo json_encode(['success' => false, 'message' => 'Database error']);
+            exit();
+        }
+        
+        $stmt->bind_param('iii', $user_id, $need_id, $quantity);
+        $result = $stmt->execute();
+        $cart_id = $stmt->insert_id;
+        $stmt->close();
+        error_log("Inserted new cart item - Cart ID: $cart_id, User: $user_id, Need: $need_id, Quantity: $quantity");
     }
 
     if ($result) {
         echo json_encode(['success' => true, 'message' => 'Item added to cart']);
     } else {
-        error_log("Database operation failed");
+        error_log("Database operation failed: " . $conn->error);
         echo json_encode(['success' => false, 'message' => 'Failed to add item to cart']);
     }
     
