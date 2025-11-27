@@ -9,22 +9,22 @@ echo "<h2>Database Connection Test</h2>";
 // Check if schools table exists
 $test_query = "SHOW TABLES LIKE 'schools'";
 $result = $db->db_fetch_one($test_query);
-echo "<p>Schools table exists: " . ($result ? "✅ YES" : "❌ NO") . "</p>";
+echo "<p>Schools table exists: " . ($result ? "YES" : "NO") . "</p>";
 
 // Check if school_needs table exists
 $test_query = "SHOW TABLES LIKE 'school_needs'";
 $result = $db->db_fetch_one($test_query);
-echo "<p>School_needs table exists: " . ($result ? "✅ YES" : "❌ NO") . "</p>";
+echo "<p>School_needs table exists: " . ($result ? "YES" : "NO") . "</p>";
 
 // Check if cart table exists
 $test_query = "SHOW TABLES LIKE 'cart'";
 $result = $db->db_fetch_one($test_query);
-echo "<p>Cart table exists: " . ($result ? "✅ YES" : "❌ NO") . "</p>";
+echo "<p>Cart table exists: " . ($result ? "YES" : "NO") . "</p>";
 
 // Check if donations table exists
 $test_query = "SHOW TABLES LIKE 'donations'";
 $result = $db->db_fetch_one($test_query);
-echo "<p>Donations table exists: " . ($result ? "✅ YES" : "❌ NO") . "</p>";
+echo "<p>Donations table exists: " . ($result ? "YES" : " NO") . "</p>";
 
 // If cart exists, check its structure
 $test_query = "SHOW TABLES LIKE 'cart'";
