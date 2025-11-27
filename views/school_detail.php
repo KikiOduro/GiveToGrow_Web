@@ -228,11 +228,19 @@ try {
     
     <!-- View Updates Button -->
     <div class="px-8 py-3">
+        <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
+        <a href="../admin/dashboard.php" 
+           class="flex items-center justify-center gap-2 bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary border-2 border-primary/30 rounded-lg px-6 py-3 font-bold hover:bg-primary/20 dark:hover:bg-primary/30 transition-colors">
+            <span class="material-symbols-outlined">dashboard</span>
+            Go to Admin Dashboard
+        </a>
+        <?php else: ?>
         <a href="school_updates.php?id=<?php echo $school_id; ?>" 
            class="flex items-center justify-center gap-2 bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary border-2 border-primary/30 rounded-lg px-6 py-3 font-bold hover:bg-primary/20 dark:hover:bg-primary/30 transition-colors">
             <span class="material-symbols-outlined">insights</span>
             View Updates & Impact
         </a>
+        <?php endif; ?>
     </div>
     
     <!-- Verified Needs Section -->
@@ -277,10 +285,6 @@ try {
                                 class="p-2 text-primary dark:text-primary bg-primary/10 dark:bg-primary/20 rounded-full hover:bg-primary/20 dark:hover:bg-primary/30 transition-colors">
                             <span class="material-symbols-outlined">add_shopping_cart</span>
                         </button>
-                    </div>
-                    <?php else: ?>
-                    <div class="mt-3 text-center">
-                        <p class="text-sm text-gray-500 dark:text-gray-400 italic">Admin view - Donation disabled</p>
                     </div>
                     <?php endif; ?>
                 </div>

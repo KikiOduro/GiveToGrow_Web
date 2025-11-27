@@ -98,7 +98,7 @@ unset($_SESSION['success_message'], $_SESSION['error_message']);
                     </a>
                 </li>
                 <li>
-                    <a href="../schools.php" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">
+                    <a href="../views/schools.php" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">
                         <span class="material-symbols-outlined">public</span>
                         View Public Site
                     </a>

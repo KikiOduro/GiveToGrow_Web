@@ -145,10 +145,12 @@ if ($category_filter && $category_filter != 'all') {
         <a class="text-[#131514] dark:text-background-light text-sm font-medium leading-normal hover:text-primary dark:hover:text-primary" href="dashboard.php#contact">Contact</a>
     </nav>
     <div class="flex gap-2 items-center">
+        <?php if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin'): ?>
         <a href="cart.php" class="relative flex items-center justify-center h-10 w-10 rounded-full hover:bg-primary/10 transition-colors">
             <span class="material-symbols-outlined text-[#131514] dark:text-background-light">shopping_cart</span>
             <span id="cart-count" class="absolute -top-1 -right-1 bg-primary text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span>
         </a>
+        <?php endif; ?>
         <span class="text-sm text-[#131514] dark:text-background-light">Welcome, <strong><?php echo $user_name; ?></strong></span>
         <a href="../actions/logout.php" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-background-light dark:bg-background-dark text-[#131514] dark:text-background-light text-sm font-bold leading-normal tracking-[0.015em] border border-primary/20 hover:bg-primary/10">
             <span class="truncate">Log Out</span>
