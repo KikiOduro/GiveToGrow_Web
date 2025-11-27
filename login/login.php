@@ -71,16 +71,16 @@ function e($value)
 
   <!-- Dark mode toggle logic -->
   <script>
-    const applyTheme = (theme) => {
-      const root = document.documentElement;
-      if (theme === "dark") {
-        root.classList.add("dark");
-        root.classList.remove("light");
-      } else {
-        root.classList.remove("dark");
-        root.classList.add("light");
-      }
-    };
+    // const applyTheme = (theme) => {
+    //   const root = document.documentElement;
+    //   if (theme === "dark") {
+    //     root.classList.add("dark");
+    //     root.classList.remove("light");
+    //   } else {
+    //     root.classList.remove("dark");
+    //     root.classList.add("light");
+    //   }
+    // };
 
     // const initTheme = () => {
     //   const stored = localStorage.getItem("theme");
@@ -94,12 +94,12 @@ function e($value)
     //   }
     // };
 
-    const toggleTheme = () => {
-      const isDark = document.documentElement.classList.contains("dark");
-      const next = isDark ? "light" : "dark";
-      applyTheme(next);
-      localStorage.setItem("theme", next);
-    };
+    // const toggleTheme = () => {
+    //   const isDark = document.documentElement.classList.contains("dark");
+    //   const next = isDark ? "light" : "dark";
+    //   applyTheme(next);
+    //   localStorage.setItem("theme", next);
+    // };
 
     // Initialize theme on page load
     // initTheme();
@@ -124,14 +124,14 @@ function e($value)
 
       <!-- Theme toggle -->
             <!-- Theme toggle -->
-      <button
+      <!-- <button
         onclick="toggleTheme()"
         type="button"
         class="flex items-center justify-center h-10 w-10 rounded-full bg-white/70 dark:bg-gray-900/60 border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition"
         aria-label="Toggle theme">
         <span class="material-symbols-outlined dark:hidden">dark_mode</span>
         <span class="material-symbols-outlined hidden dark:inline">light_mode</span>
-      </button>
+      </button> -->
     </header>
 
     <!-- Login Card -->

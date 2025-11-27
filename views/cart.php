@@ -73,13 +73,13 @@ $total = $subtotal + $processing_fee;
         }
         
         // Theme toggle functionality
-        function initTheme() {
-            const theme = localStorage.getItem('theme') || 'light';
-            document.documentElement.classList.toggle('dark', theme === 'dark');
-        }
+        // function initTheme() {
+        //     const theme = localStorage.getItem('theme') || 'light';
+        //     document.documentElement.classList.toggle('dark', theme === 'dark');
+        // }
         
-        // Initialize theme on page load
-        initTheme();
+        // // Initialize theme on page load
+        // initTheme();
     </script>
     <style>
         .material-symbols-outlined {
