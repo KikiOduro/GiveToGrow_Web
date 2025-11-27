@@ -23,7 +23,7 @@ if (!$reference) {
 }
 
 $user_name = $_SESSION['user_name'] ?? 'Donor';
-error_log("=== PAYSTACK CALLBACK PAGE ===");
+error_log("PAYSTACK CALLBACK PAGE");
 error_log("Reference from URL: $reference, User: {$_SESSION['user_id']}");
 ?>
 <!DOCTYPE html>
@@ -53,11 +53,11 @@ error_log("Reference from URL: $reference, User: {$_SESSION['user_id']}");
             },
         }
         
-        function initTheme() {
-            const theme = localStorage.getItem('theme') || 'light';
-            document.documentElement.classList.toggle('dark', theme === 'dark');
-        }
-        initTheme();
+        // function initTheme() {
+        //     const theme = localStorage.getItem('theme') || 'light';
+        //     document.documentElement.classList.toggle('dark', theme === 'dark');
+        // }
+        // initTheme();
     </script>
     <style>
         .spinner {
@@ -139,7 +139,7 @@ error_log("Reference from URL: $reference, User: {$_SESSION['user_id']}");
             const reference = '<?php echo htmlspecialchars($reference); ?>';
             
             try {
-                const response = await fetch('actions/paystack_verify_payment.php', {
+                const response = await fetch('../actions/paystack_verify_payment.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

@@ -11,7 +11,7 @@ if (!isset($_SESSION['user_id'])) {
 $user_name = isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : 'User';
 
 // Fetch impact statistics from database
-require_once 'settings/db_class.php';
+require_once __DIR__ . '/../settings/db_class.php';
 $db = new db_connection();
 
 // Total students reached

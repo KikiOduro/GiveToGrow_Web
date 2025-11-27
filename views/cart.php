@@ -7,7 +7,7 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-require_once __DIR__ . '/settings/db_class.php';
+require_once __DIR__ . '/../settings/db_class.php';
 
 $db = new db_connection();
 

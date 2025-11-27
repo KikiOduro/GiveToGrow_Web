@@ -7,7 +7,7 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-require_once __DIR__ . '/settings/db_class.php';
+require_once __DIR__ . '/../settings/db_class.php';
 
 $db = new db_connection();
 
@@ -79,14 +79,14 @@ $primary_school = $cart_items[0]['school_name'];
             },
         }
         
-        // Theme toggle functionality
-        function initTheme() {
-            const theme = localStorage.getItem('theme') || 'light';
-            document.documentElement.classList.toggle('dark', theme === 'dark');
-        }
+        // // Theme toggle functionality
+        // function initTheme() {
+        //     const theme = localStorage.getItem('theme') || 'light';
+        //     document.documentElement.classList.toggle('dark', theme === 'dark');
+        // }
         
-        // Initialize theme on page load
-        initTheme();
+        // // Initialize theme on page load
+        // initTheme();
     </script>
     <style>
         body {
@@ -311,7 +311,7 @@ document.getElementById('checkoutForm').addEventListener('submit', function(e) {
     submitBtn.disabled = true;
     
     // Initialize Paystack transaction
-    fetch('actions/paystack_init_transaction.php', {
+    fetch('../actions/paystack_init_transaction.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
