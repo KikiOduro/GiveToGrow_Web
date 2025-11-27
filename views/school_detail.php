@@ -174,7 +174,7 @@ try {
 <div class="layout-content-container flex flex-col w-full max-w-2xl">
     <!-- ToolBar -->
     <div class="flex justify-between items-center px-4 py-3 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm sticky top-0 z-10">
-        <a href="admin/manage_schools.php" class="p-2 text-neutral-800 dark:text-neutral-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full">
+        <a href="/../admin/manage_schools.php" class="p-2 text-neutral-800 dark:text-neutral-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full">
             <span class="material-symbols-outlined">arrow_back</span>
         </a>
         <div class="flex items-center gap-2">
