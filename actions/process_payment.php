@@ -63,46 +63,67 @@ try {
     foreach ($cart_items as $item) {
         $donation_amount = $item['unit_price'] * $item['quantity'];
         
-        // Insert into donations table
-        $insert_donation = "INSERT INTO donations (user_id, school_id, need_id, amount, quantity, payment_method, payment_status, donor_name, donor_email, transaction_date) 
-                           VALUES (?, ?, ?, ?, ?, ?, 'completed', ?, ?, NOW())";
+        // Insert into donations table - using actual column names from the schema
+        $insert_donation = "INSERT INTO donations 
+                           (user_id, school_id, need_id, amount, donation_type, quantity, 
+                            payment_method, payment_status, transaction_id) 
+                           VALUES (?, ?, ?, ?, 'item', ?, ?, 'completed', ?)";
         
-        $result = $db->db_query($insert_donation, [
+        // Get the connection and prepare statement
+        $conn = $db->db_conn();
+        $stmt = $conn->prepare($insert_donation);
+        
+        if (!$stmt) {
+            throw new Exception('Failed to prepare donation insert: ' . $conn->error);
+        }
+        
+        // Generate a transaction ID for tracking
+        $transaction_id = 'TXN_' . time() . '_' . $user_id . '_' . rand(1000, 9999);
+        
+        // Bind parameters: i=integer, d=double/decimal, s=string
+        $stmt->bind_param('iiidiss', 
             $user_id,
             $item['school_id'],
             $item['need_id'],
             $donation_amount,
             $item['quantity'],
             $payment_method,
-            $full_name,
-            $email
-        ]);
+            $transaction_id
+        );
         
-        if (!$result) {
-            throw new Exception('Failed to create donation record');
+        if (!$stmt->execute()) {
+            throw new Exception('Failed to execute donation insert: ' . $stmt->error);
         }
         
-        // Get the last inserted donation_id
-        $donation_id_query = "SELECT LAST_INSERT_ID() as donation_id";
-        $donation_result = $db->db_fetch_one($donation_id_query);
-        $donation_ids[] = $donation_result['donation_id'];
+        // Get the auto-generated donation_id
+        $donation_ids[] = $stmt->insert_id;
+        $stmt->close();
         
         // Update quantity_fulfilled in school_needs
         $update_fulfilled = "UPDATE school_needs 
                             SET quantity_fulfilled = COALESCE(quantity_fulfilled, 0) + ? 
                             WHERE need_id = ?";
-        $db->db_query($update_fulfilled, [$item['quantity'], $item['need_id']]);
+        $stmt2 = $conn->prepare($update_fulfilled);
+        $stmt2->bind_param('ii', $item['quantity'], $item['need_id']);
+        $stmt2->execute();
+        $stmt2->close();
         
         // Update amount_raised in schools table
         $update_school = "UPDATE schools 
                          SET amount_raised = amount_raised + ? 
                          WHERE school_id = ?";
-        $db->db_query($update_school, [$donation_amount, $item['school_id']]);
+        $stmt3 = $conn->prepare($update_school);
+        $stmt3->bind_param('di', $donation_amount, $item['school_id']);
+        $stmt3->execute();
+        $stmt3->close();
     }
     
     // Clear the user's cart
     $clear_cart = "DELETE FROM cart WHERE user_id = ?";
-    $db->db_query($clear_cart, [$user_id]);
+    $stmt4 = $conn->prepare($clear_cart);
+    $stmt4->bind_param('i', $user_id);
+    $stmt4->execute();
+    $stmt4->close();
     
     // Commit transaction
     $db->db_query("COMMIT");
