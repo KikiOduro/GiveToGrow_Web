@@ -108,24 +108,24 @@ function getPriorityBadge($school_id, $db) {
     </style>
 <script>
         // Theme toggle functionality
-        function initTheme() {
-            const theme = localStorage.getItem('theme') || 'light';
-            if (theme === 'dark') {
-                document.documentElement.classList.add('dark');
-            }
-        }
-        function toggleTheme() {
-            const html = document.documentElement;
-            if (html.classList.contains('dark')) {
-                html.classList.remove('dark');
-                localStorage.setItem('theme', 'light');
-            } else {
-                html.classList.add('dark');
-                localStorage.setItem('theme', 'dark');
-            }
-        }
-        // Initialize theme on page load
-        initTheme();
+        // function initTheme() {
+        //     const theme = localStorage.getItem('theme') || 'light';
+        //     if (theme === 'dark') {
+        //         document.documentElement.classList.add('dark');
+        //     }
+        // }
+        // function toggleTheme() {
+        //     const html = document.documentElement;
+        //     if (html.classList.contains('dark')) {
+        //         html.classList.remove('dark');
+        //         localStorage.setItem('theme', 'light');
+        //     } else {
+        //         html.classList.add('dark');
+        //         localStorage.setItem('theme', 'dark');
+        //     }
+        // }
+        // // Initialize theme on page load
+        // initTheme();
     </script>
 </head>
 <body class="bg-background-light dark:bg-background-dark font-display text-text-light dark:text-text-dark">

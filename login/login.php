@@ -82,17 +82,17 @@ function e($value)
       }
     };
 
-    const initTheme = () => {
-      const stored = localStorage.getItem("theme");
-      if (stored === "dark" || stored === "light") {
-        applyTheme(stored);
-      } else {
-        const prefersDark = window.matchMedia(
-          "(prefers-color-scheme: dark)"
-        ).matches;
-        applyTheme(prefersDark ? "dark" : "light");
-      }
-    };
+    // const initTheme = () => {
+    //   const stored = localStorage.getItem("theme");
+    //   if (stored === "dark" || stored === "light") {
+    //     applyTheme(stored);
+    //   } else {
+    //     const prefersDark = window.matchMedia(
+    //       "(prefers-color-scheme: dark)"
+    //     ).matches;
+    //     applyTheme(prefersDark ? "dark" : "light");
+    //   }
+    // };
 
     const toggleTheme = () => {
       const isDark = document.documentElement.classList.contains("dark");
@@ -102,7 +102,7 @@ function e($value)
     };
 
     // Initialize theme on page load
-    initTheme();
+    // initTheme();
   </script>
 </head>
 

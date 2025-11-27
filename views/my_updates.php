@@ -63,19 +63,19 @@ $user_name = htmlspecialchars($_SESSION['user_name'] ?? 'User');
             }
         }
         
-        function initTheme() {
-            const theme = localStorage.getItem('theme') || 'light';
-            document.documentElement.classList.toggle('dark', theme === 'dark');
-        }
+        // function initTheme() {
+        //     const theme = localStorage.getItem('theme') || 'light';
+        //     document.documentElement.classList.toggle('dark', theme === 'dark');
+        // }
         
-        function toggleTheme() {
-            const html = document.documentElement;
-            const isDark = html.classList.contains('dark');
-            html.classList.toggle('dark');
-            localStorage.setItem('theme', isDark ? 'light' : 'dark');
-        }
+        // function toggleTheme() {
+        //     const html = document.documentElement;
+        //     const isDark = html.classList.contains('dark');
+        //     html.classList.toggle('dark');
+        //     localStorage.setItem('theme', isDark ? 'light' : 'dark');
+        // }
         
-        initTheme();
+        // initTheme();
     </script>
 </head>
 <body class="bg-gray-50 dark:bg-neutral-900 font-display">
