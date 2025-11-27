@@ -1,6 +1,6 @@
 <?php
 // Fetch data from database for landing page
-require_once 'settings/db_class.php';
+require_once '../settings/db_class.php';
 $db = new db_connection();
 
 // Fetch impact statistics

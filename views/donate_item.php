@@ -15,7 +15,7 @@ if ($need_id <= 0) {
     exit();
 }
 
-require_once __DIR__ . '/settings/db_class.php';
+require_once __DIR__ . '/../settings/db_class.php';
 
 $db = new db_connection();
 

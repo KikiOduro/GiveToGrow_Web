@@ -12,7 +12,7 @@ $user_name = isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_na
 $user_email = isset($_SESSION['user_email']) ? htmlspecialchars($_SESSION['user_email']) : '';
 
 // Fetch featured schools from database
-require_once __DIR__ . '/settings/db_class.php';
+require_once __DIR__ . '/../settings/db_class.php';
 $db = new db_connection();
 
 // Fetch impact statistics
