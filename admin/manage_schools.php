@@ -193,6 +193,10 @@ $schools = $db->db_fetch_all($query);
                                            class="text-primary hover:text-primary/80" title="Add Need">
                                             <span class="material-symbols-outlined text-xl">add_circle</span>
                                         </a>
+                                        <button onclick="deleteSchool(<?php echo $school['school_id']; ?>, '<?php echo htmlspecialchars(addslashes($school['school_name'])); ?>')" 
+                                           class="text-red-600 hover:text-red-800 dark:text-red-400" title="Delete">
+                                            <span class="material-symbols-outlined text-xl">delete</span>
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
@@ -204,5 +208,33 @@ $schools = $db->db_fetch_all($query);
         </div>
     </main>
 </div>
+
+<script>
+function deleteSchool(schoolId, schoolName) {
+    if (confirm(`Are you sure you want to delete "${schoolName}"?\n\nThis will also delete all associated needs and donations. This action cannot be undone.`)) {
+        fetch('../actions/delete_school.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'school_id=' + schoolId
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('School deleted successfully!');
+                location.reload();
+            } else {
+                alert('Error: ' + (data.message || 'Failed to delete school'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while deleting the school.');
+        });
+    }
+}
+</script>
+
 </body>
 </html>
