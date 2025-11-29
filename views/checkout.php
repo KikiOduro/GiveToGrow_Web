@@ -52,6 +52,7 @@ $primary_school = $cart_items[0]['school_name'];
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>GiveToGrow - Complete Your Donation</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://fonts.googleapis.com" rel="preconnect"/>
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
@@ -300,7 +301,12 @@ document.getElementById('checkoutForm').addEventListener('submit', function(e) {
     
     // Validate email
     if (!email || !email.includes('@')) {
-        alert('Please enter a valid email address');
+        Swal.fire({
+            title: 'Invalid Email',
+            text: 'Please enter a valid email address',
+            icon: 'warning',
+            confirmButtonColor: '#A4B8A4'
+        });
         return;
     }
     
@@ -339,14 +345,24 @@ document.getElementById('checkoutForm').addEventListener('submit', function(e) {
             }, 1000);
         } else {
             // Show error
-            alert(data.message || 'Failed to initialize payment. Please try again.');
+            Swal.fire({
+                title: 'Payment Error',
+                text: data.message || 'Failed to initialize payment. Please try again.',
+                icon: 'error',
+                confirmButtonColor: '#A4B8A4'
+            });
             submitBtn.textContent = originalText;
             submitBtn.disabled = false;
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Connection error. Please check your internet and try again.');
+        Swal.fire({
+            title: 'Connection Error',
+            text: 'Please check your internet and try again.',
+            icon: 'error',
+            confirmButtonColor: '#A4B8A4'
+        });
         submitBtn.textContent = originalText;
         submitBtn.disabled = false;
     });

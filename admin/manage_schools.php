@@ -25,6 +25,7 @@ $schools = $db->db_fetch_all($query);
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         tailwind.config = {
             darkMode: "class",
@@ -211,28 +212,53 @@ $schools = $db->db_fetch_all($query);
 
 <script>
 function deleteSchool(schoolId, schoolName) {
-    if (confirm(`Are you sure you want to delete "${schoolName}"?\n\nThis will also delete all associated needs and donations. This action cannot be undone.`)) {
-        fetch('../actions/delete_school.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: 'school_id=' + schoolId
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('School deleted successfully!');
-                location.reload();
-            } else {
-                alert('Error: ' + (data.message || 'Failed to delete school'));
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred while deleting the school.');
-        });
-    }
+    Swal.fire({
+        title: 'Are you sure?',
+        html: `You want to delete "<strong>${schoolName}</strong>"?<br><br>This will also delete all associated needs and donations. This action cannot be undone.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#A4B8A4',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch('../actions/delete_school.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'school_id=' + schoolId
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Deleted!',
+                        text: 'School deleted successfully!',
+                        icon: 'success',
+                        confirmButtonColor: '#A4B8A4'
+                    }).then(() => location.reload());
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: data.message || 'Failed to delete school',
+                        icon: 'error',
+                        confirmButtonColor: '#A4B8A4'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'An error occurred while deleting the school.',
+                    icon: 'error',
+                    confirmButtonColor: '#A4B8A4'
+                });
+            });
+        }
+    });
 }
 </script>
 

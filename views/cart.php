@@ -45,6 +45,7 @@ $total = $subtotal + $processing_fee;
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>GiveToGrow - Review Your Donation</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://fonts.googleapis.com" rel="preconnect"/>
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;700;800;900&amp;display=swap" rel="stylesheet"/>
@@ -249,40 +250,75 @@ function updateQuantity(cartId, change) {
             // Reload page to show updated quantities and totals
             location.reload();
         } else {
-            alert(data.message || 'Failed to update quantity');
+            Swal.fire({
+                title: 'Error!',
+                text: data.message || 'Failed to update quantity',
+                icon: 'error',
+                confirmButtonColor: '#A4B8A4'
+            });
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('An error occurred. Please try again.');
+        Swal.fire({
+            title: 'Error!',
+            text: 'An error occurred. Please try again.',
+            icon: 'error',
+            confirmButtonColor: '#A4B8A4'
+        });
     });
 }
 
 // Remove item from cart
 function removeFromCart(cartId) {
-    if (!confirm('Are you sure you want to remove this item from your cart?')) {
-        return;
-    }
-    
-    const formData = new FormData();
-    formData.append('cart_id', cartId);
-    formData.append('action', 'remove');
-    
-    fetch('actions/update_cart.php', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            location.reload();
-        } else {
-            alert(data.message || 'Failed to remove item');
+    Swal.fire({
+        title: 'Remove Item?',
+        text: 'Are you sure you want to remove this item from your cart?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#A4B8A4',
+        confirmButtonText: 'Yes, remove it',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const formData = new FormData();
+            formData.append('cart_id', cartId);
+            formData.append('action', 'remove');
+            
+            fetch('actions/update_cart.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Removed!',
+                        text: 'Item removed from cart',
+                        icon: 'success',
+                        confirmButtonColor: '#A4B8A4',
+                        timer: 1500
+                    }).then(() => location.reload());
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: data.message || 'Failed to remove item',
+                        icon: 'error',
+                        confirmButtonColor: '#A4B8A4'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'An error occurred. Please try again.',
+                    icon: 'error',
+                    confirmButtonColor: '#A4B8A4'
+                });
+            });
         }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred. Please try again.');
     });
 }
 

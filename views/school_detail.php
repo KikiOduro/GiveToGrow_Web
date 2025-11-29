@@ -71,6 +71,7 @@ try {
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         tailwind.config = {
             darkMode: "class",
@@ -121,12 +122,22 @@ try {
                     // Show success modal with options
                     showAddToCartModal();
                 } else {
-                    alert(data.message || 'Failed to add item to cart');
+                    Swal.fire({
+                        title: 'Error!',
+                        text: data.message || 'Failed to add item to cart',
+                        icon: 'error',
+                        confirmButtonColor: '#A4B8A4'
+                    });
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('An error occurred. Please try again.');
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'An error occurred. Please try again.',
+                    icon: 'error',
+                    confirmButtonColor: '#A4B8A4'
+                });
             });
         }
 

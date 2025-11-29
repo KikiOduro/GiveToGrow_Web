@@ -48,6 +48,7 @@ $remaining = $need['quantity_needed'] - $quantity_fulfilled;
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>GiveToGrow - <?php echo htmlspecialchars($need['item_name']); ?> Donation</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://fonts.googleapis.com" rel="preconnect"/>
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
@@ -289,12 +290,22 @@ document.getElementById('donationForm').addEventListener('submit', function(e) {
             // Show success modal
             showAddToCartModal();
         } else {
-            alert(data.message || 'Failed to add item to cart');
+            Swal.fire({
+                title: 'Error!',
+                text: data.message || 'Failed to add item to cart',
+                icon: 'error',
+                confirmButtonColor: '#A4B8A4'
+            });
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Error: ' + error.message + '\n\nPlease check the browser console (F12) for details.');
+        Swal.fire({
+            title: 'Error!',
+            html: `${error.message}<br><br><small>Please check the browser console (F12) for details.</small>`,
+            icon: 'error',
+            confirmButtonColor: '#A4B8A4'
+        });
     });
 });
 
