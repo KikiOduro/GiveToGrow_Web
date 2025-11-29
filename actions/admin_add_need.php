@@ -37,10 +37,18 @@ if ($school_id <= 0 || empty($item_name) || empty($item_category) || $unit_price
 $db = new db_connection();
 
 try {
+    $conn = $db->db_conn();
+    
     $query = "INSERT INTO school_needs (school_id, item_name, item_description, item_category, unit_price, quantity_needed, image_url, priority) 
               VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     
-    $result = $db->db_query($query, [
+    $stmt = $conn->prepare($query);
+    
+    if (!$stmt) {
+        throw new Exception("Failed to prepare statement: " . $conn->error);
+    }
+    
+    $stmt->bind_param('isssdiss', 
         $school_id,
         $item_name,
         $item_description,
@@ -49,7 +57,10 @@ try {
         $quantity_needed,
         $image_url,
         $priority
-    ]);
+    );
+    
+    $result = $stmt->execute();
+    $stmt->close();
     
     if ($result) {
         $_SESSION['success_message'] = "School need '$item_name' added successfully!";
