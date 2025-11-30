@@ -1,11 +1,15 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 session_start();
 require_once __DIR__ . '/../settings/db_class.php';
 
 // Check admin authentication
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
     $_SESSION['error_message'] = "Access denied. Admin privileges required.";
-    header("Location: ../dashboard.php");
+    header("Location: ../admin/dashboard.php");
     exit();
 }
 
@@ -39,6 +43,10 @@ $db = new db_connection();
 try {
     $conn = $db->db_conn();
     
+    if (!$conn) {
+        throw new Exception("Database connection failed");
+    }
+    
     $query = "INSERT INTO school_needs (school_id, item_name, item_description, item_category, unit_price, quantity_needed, image_url, priority) 
               VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     
@@ -48,7 +56,7 @@ try {
         throw new Exception("Failed to prepare statement: " . $conn->error);
     }
     
-    $stmt->bind_param('isssdiss', 
+    $stmt->bind_param('isssdiis', 
         $school_id,
         $item_name,
         $item_description,
@@ -60,18 +68,18 @@ try {
     );
     
     $result = $stmt->execute();
+    
+    if (!$result) {
+        throw new Exception("Execute failed: " . $stmt->error);
+    }
+    
     $stmt->close();
     
-    if ($result) {
-        $_SESSION['success_message'] = "School need '$item_name' added successfully!";
-        header("Location: ../admin/add_need.php?school_id=" . $school_id);
-    } else {
-        $_SESSION['error_message'] = "Failed to add school need. Please try again.";
-        header("Location: ../admin/add_need.php?school_id=" . $school_id);
-    }
+    $_SESSION['success_message'] = "School need '$item_name' added successfully!";
+    header("Location: ../admin/add_need.php?school_id=" . $school_id);
 } catch (Exception $e) {
     error_log("Error adding school need: " . $e->getMessage());
-    $_SESSION['error_message'] = "An error occurred while adding the school need.";
+    $_SESSION['error_message'] = "An error occurred while adding the school need: " . $e->getMessage();
     header("Location: ../admin/add_need.php?school_id=" . $school_id);
 }
 
