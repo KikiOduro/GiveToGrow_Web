@@ -246,10 +246,10 @@ try {
             Go to Admin Dashboard
         </a>
         <?php else: ?>
-        <a href="school_updates.php?id=<?php echo $school_id; ?>" 
+        <a href="my_impact.php" 
            class="flex items-center justify-center gap-2 bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary border-2 border-primary/30 rounded-lg px-6 py-3 font-bold hover:bg-primary/20 dark:hover:bg-primary/30 transition-colors">
             <span class="material-symbols-outlined">insights</span>
-            View Updates & Impact
+            View Impact & Updates
         </a>
         <?php endif; ?>
     </div>
