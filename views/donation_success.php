@@ -96,6 +96,34 @@ $schools_text = count($schools_list) > 1 ? implode(', ', array_slice($schools_li
             stroke-dasharray: 100;
             animation: checkmark 0.8s ease-in-out 0.4s forwards;
         }
+        
+        /* Print/Receipt Styles */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #receipt-section, #receipt-section * {
+                visibility: visible;
+            }
+            #receipt-section {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                padding: 20px;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+        
+        #receipt-section {
+            display: none;
+        }
+        
+        #receipt-section.show-receipt {
+            display: block;
+        }
     </style>
 </head>
 <body class="font-display bg-background-light dark:bg-background-dark">
@@ -163,6 +191,11 @@ $schools_text = count($schools_list) > 1 ? implode(', ', array_slice($schools_li
         
         <!-- Action Buttons -->
         <div class="space-y-3">
+            <button onclick="downloadReceipt()" 
+               class="flex w-full items-center justify-center gap-2 rounded-lg h-12 bg-green-600 text-white text-base font-bold hover:bg-green-700 transition-colors">
+                <span class="material-symbols-outlined">download</span>
+                Download Receipt
+            </button>
             <a href="schools.php" 
                class="flex w-full items-center justify-center rounded-lg h-12 bg-primary text-white text-base font-bold hover:opacity-90 transition-opacity">
                 Continue Donating
@@ -182,5 +215,100 @@ $schools_text = count($schools_list) > 1 ? implode(', ', array_slice($schools_li
         </div>
     </div>
 </div>
+
+<!-- Printable Receipt Section (Hidden, shown only for print/download) -->
+<div id="receipt-section" class="bg-white p-8 max-w-2xl mx-auto">
+    <div class="border-2 border-gray-300 p-8">
+        <!-- Receipt Header -->
+        <div class="text-center border-b-2 border-gray-300 pb-6 mb-6">
+            <h1 class="text-3xl font-bold text-green-700 mb-2">GiveToGrow</h1>
+            <p class="text-gray-600">Empowering Schools, Transforming Lives</p>
+            <p class="text-sm text-gray-500 mt-2">http://169.239.251.102:442/~akua.oduro</p>
+        </div>
+        
+        <!-- Receipt Title -->
+        <div class="text-center mb-6">
+            <h2 class="text-2xl font-bold text-gray-800">DONATION RECEIPT</h2>
+            <p class="text-gray-600 mt-1">Official Receipt for Tax Purposes</p>
+        </div>
+        
+        <!-- Receipt Details -->
+        <div class="grid grid-cols-2 gap-4 mb-6 text-sm">
+            <div>
+                <p class="text-gray-600">Receipt Number:</p>
+                <p class="font-bold text-gray-800">#<?php echo str_pad($donation_id, 6, '0', STR_PAD_LEFT); ?></p>
+            </div>
+            <div class="text-right">
+                <p class="text-gray-600">Date:</p>
+                <p class="font-bold text-gray-800"><?php echo date('F j, Y', strtotime($primary_donation['transaction_date'])); ?></p>
+            </div>
+            <div>
+                <p class="text-gray-600">Donor Email:</p>
+                <p class="font-bold text-gray-800"><?php echo htmlspecialchars($donor_email); ?></p>
+            </div>
+            <div class="text-right">
+                <p class="text-gray-600">Payment Status:</p>
+                <p class="font-bold text-green-600">COMPLETED</p>
+            </div>
+        </div>
+        
+        <!-- Donation Items Table -->
+        <table class="w-full mb-6 text-sm">
+            <thead>
+                <tr class="border-b-2 border-gray-300">
+                    <th class="text-left py-2 text-gray-600">Item</th>
+                    <th class="text-left py-2 text-gray-600">School</th>
+                    <th class="text-center py-2 text-gray-600">Qty</th>
+                    <th class="text-right py-2 text-gray-600">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($donations as $donation): ?>
+                <tr class="border-b border-gray-200">
+                    <td class="py-3 text-gray-800"><?php echo htmlspecialchars($donation['item_name']); ?></td>
+                    <td class="py-3 text-gray-600"><?php echo htmlspecialchars($donation['school_name']); ?></td>
+                    <td class="py-3 text-center text-gray-800"><?php echo $donation['quantity']; ?></td>
+                    <td class="py-3 text-right text-gray-800">₵<?php echo number_format($donation['amount'], 2); ?></td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+            <tfoot>
+                <tr class="border-t-2 border-gray-300">
+                    <td colspan="3" class="py-3 text-right font-bold text-gray-800">Total Donation:</td>
+                    <td class="py-3 text-right font-bold text-xl text-green-700">₵<?php echo number_format($total_amount, 2); ?></td>
+                </tr>
+            </tfoot>
+        </table>
+        
+        <!-- Thank You Message -->
+        <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6 text-center">
+            <p class="text-green-800 font-semibold">Thank you for your generous donation!</p>
+            <p class="text-green-600 text-sm mt-1">Your contribution will help provide essential resources to students in need.</p>
+        </div>
+        
+        <!-- Footer -->
+        <div class="text-center text-xs text-gray-500 border-t border-gray-200 pt-4">
+            <p>This receipt is computer-generated and is valid without signature.</p>
+            <p class="mt-1">For any inquiries, please contact: support@givetogrow.org</p>
+            <p class="mt-2 font-semibold">GiveToGrow - Making Education Accessible for All</p>
+        </div>
+    </div>
+</div>
+
+<script>
+function downloadReceipt() {
+    // Show receipt section for printing
+    document.getElementById('receipt-section').classList.add('show-receipt');
+    
+    // Trigger print dialog
+    window.print();
+    
+    // Hide receipt section after print dialog closes
+    setTimeout(function() {
+        document.getElementById('receipt-section').classList.remove('show-receipt');
+    }, 1000);
+}
+</script>
+
 </body>
 </html>
