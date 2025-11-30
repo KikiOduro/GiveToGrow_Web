@@ -30,6 +30,10 @@ $quantity_needed = intval($_POST['quantity_needed'] ?? 0);
 $image_url = trim($_POST['image_url'] ?? '');
 $priority = $_POST['priority'] ?? 'medium';
 
+// Debug: Log what we received
+error_log("ADD NEED - Received image_url: " . $image_url);
+error_log("ADD NEED - POST data: " . print_r($_POST, true));
+
 // Validate required fields
 if ($school_id <= 0 || empty($item_name) || empty($item_category) || $unit_price <= 0 || $quantity_needed <= 0 || empty($image_url)) {
     $_SESSION['error_message'] = "All required fields must be filled out correctly.";
