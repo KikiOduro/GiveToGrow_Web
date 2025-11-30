@@ -91,6 +91,22 @@ $history_query = "
     LIMIT 20
 ";
 $donation_history = $db->db_fetch_all($history_query, [$user_id]);
+
+// Fetch recent updates from schools the user has donated to
+$updates_query = "
+    SELECT su.*, s.school_name, s.image_url as school_image
+    FROM school_updates su
+    JOIN schools s ON su.school_id = s.school_id
+    WHERE su.school_id IN (
+        SELECT DISTINCT school_id 
+        FROM donations 
+        WHERE user_id = ? AND payment_status = 'completed'
+    )
+    AND su.is_published = 1
+    ORDER BY su.created_at DESC
+    LIMIT 5
+";
+$recent_updates = $db->db_fetch_all($updates_query, [$user_id]);
 ?>
 <!DOCTYPE html>
 <html class="light" lang="en">
@@ -297,6 +313,61 @@ $donation_history = $db->db_fetch_all($history_query, [$user_id]);
                             <?php endforeach; ?>
                         </tbody>
                     </table>
+                </div>
+                <?php endif; ?>
+
+                <!-- School Updates Section -->
+                <div class="flex justify-between items-center px-1 pb-3 pt-8">
+                    <h2 class="text-[#131514] dark:text-background-light text-[22px] font-bold leading-tight tracking-[-0.015em]">Updates From Schools You Support</h2>
+                    <?php if (!empty($recent_updates)): ?>
+                    <a href="my_updates.php" class="text-primary font-medium text-sm hover:underline">View All Updates →</a>
+                    <?php endif; ?>
+                </div>
+
+                <?php if (empty($recent_updates)): ?>
+                <div class="rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-background-dark/50 p-12 text-center">
+                    <span class="material-symbols-outlined text-6xl text-gray-300 mb-4">campaign</span>
+                    <h3 class="text-xl font-bold text-[#131514] dark:text-background-light mb-2">No Updates Yet</h3>
+                    <p class="text-[#60826b] dark:text-gray-400 mb-2">Schools you support will post updates and photos here.</p>
+                    <p class="text-[#60826b] dark:text-gray-400 text-sm">Check back soon to see how your donations are making a difference!</p>
+                </div>
+                <?php else: ?>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <?php 
+                    $update_types = [
+                        'general' => ['icon' => 'campaign', 'color' => 'bg-blue-100 text-blue-700'],
+                        'milestone' => ['icon' => 'emoji_events', 'color' => 'bg-yellow-100 text-yellow-700'],
+                        'progress' => ['icon' => 'trending_up', 'color' => 'bg-green-100 text-green-700'],
+                        'completion' => ['icon' => 'check_circle', 'color' => 'bg-purple-100 text-purple-700'],
+                        'thank_you' => ['icon' => 'favorite', 'color' => 'bg-pink-100 text-pink-700']
+                    ];
+                    
+                    foreach ($recent_updates as $update): 
+                        $type_info = $update_types[$update['update_type'] ?? 'general'] ?? $update_types['general'];
+                    ?>
+                    <div class="rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-background-dark/50 overflow-hidden hover:shadow-lg transition-shadow">
+                        <?php if (!empty($update['image_url'])): ?>
+                        <div class="h-48 bg-cover bg-center" style="background-image: url('<?php echo htmlspecialchars($update['image_url']); ?>');"></div>
+                        <?php endif; ?>
+                        <div class="p-5">
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="<?php echo $type_info['color']; ?> px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1">
+                                    <span class="material-symbols-outlined" style="font-size: 14px;"><?php echo $type_info['icon']; ?></span>
+                                    <?php echo ucfirst(str_replace('_', ' ', $update['update_type'] ?? 'Update')); ?>
+                                </span>
+                                <span class="text-xs text-gray-500"><?php echo date('M j, Y', strtotime($update['created_at'])); ?></span>
+                            </div>
+                            <h4 class="font-bold text-[#131514] dark:text-background-light mb-1"><?php echo htmlspecialchars($update['update_title']); ?></h4>
+                            <p class="text-sm text-primary font-medium mb-2"><?php echo htmlspecialchars($update['school_name']); ?></p>
+                            <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                                <?php echo htmlspecialchars(substr($update['update_description'], 0, 120)); ?>...
+                            </p>
+                            <a href="school_updates.php?id=<?php echo $update['school_id']; ?>" class="inline-flex items-center gap-1 text-primary text-sm font-medium mt-3 hover:underline">
+                                Read More <span class="material-symbols-outlined" style="font-size: 16px;">arrow_forward</span>
+                            </a>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
                 </div>
                 <?php endif; ?>
             </div>
