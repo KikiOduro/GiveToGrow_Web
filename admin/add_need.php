@@ -56,7 +56,7 @@ $schools = $db->db_fetch_all("SELECT school_id, school_name, location FROM schoo
         }
     </style>
 </head>
-<body class="bg-background-light dark:bg-background-dark text-[#333333] dark:text-background-light font-display">
+<body class="bg-background-light dark:bg-background-dark text-[#333333] dark:text-background-light font-display min-h-screen overflow-auto">
 <div class="flex min-h-screen">
     <!-- Sidebar -->
     <aside class="w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 flex flex-col">
@@ -302,6 +302,9 @@ const CLOUDINARY_CLOUD_NAME = 'dlih7wpyw';
 const CLOUDINARY_UPLOAD_PRESET = 'givetogrow_unsigned';
 
 function openUploadWidget() {
+    // Store current scroll position
+    const scrollPos = window.scrollY;
+    
     cloudinary.openUploadWidget({
         cloudName: CLOUDINARY_CLOUD_NAME,
         uploadPreset: CLOUDINARY_UPLOAD_PRESET,
@@ -336,6 +339,15 @@ function openUploadWidget() {
             }
         }
     }, (error, result) => {
+        // Restore scroll ability after widget closes
+        document.body.style.overflow = 'auto';
+        document.documentElement.style.overflow = 'auto';
+        
+        if (result && result.event === "close") {
+            // Widget was closed, restore scroll
+            window.scrollTo(0, scrollPos);
+        }
+        
         if (!error && result && result.event === "success") {
             // Get the secure URL
             const imageUrl = result.info.secure_url;
