@@ -376,14 +376,24 @@ $categories = [
                 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Image</label>
-                    <div class="flex gap-4 items-center">
+                    <div class="flex gap-4 items-start">
                         <img id="edit_image_preview" src="" alt="Preview" class="w-20 h-20 rounded-lg object-cover border"
                              onerror="this.src='https://placehold.co/100x100/A4B8A4/white?text=No+Image'"/>
                         <div class="flex-1">
                             <input type="hidden" id="edit_image_url" name="image_url"/>
+                            <div class="flex gap-2 mb-2">
+                                <input type="url" id="edit_image_url_input" 
+                                       class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-sm"
+                                       placeholder="Paste image URL here..."
+                                       onchange="setEditImageUrl(this.value)"/>
+                                <button type="button" onclick="applyImageUrl()" 
+                                        class="px-3 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-opacity-90">
+                                    Set
+                                </button>
+                            </div>
                             <button type="button" onclick="openEditUploadWidget()" 
                                     class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 text-sm">
-                                Change Image
+                                Or Upload via Cloudinary
                             </button>
                         </div>
                     </div>
@@ -419,6 +429,7 @@ function editNeed(need) {
     document.getElementById('edit_priority').value = need.priority;
     document.getElementById('edit_status').value = need.status;
     document.getElementById('edit_image_url').value = need.image_url || '';
+    document.getElementById('edit_image_url_input').value = need.image_url || '';
     document.getElementById('edit_image_preview').src = need.image_url || 'https://placehold.co/100x100/A4B8A4/white?text=No+Image';
     
     document.getElementById('editModal').classList.remove('hidden');
@@ -426,6 +437,36 @@ function editNeed(need) {
 
 function closeEditModal() {
     document.getElementById('editModal').classList.add('hidden');
+}
+
+// Set image URL from direct input
+function setEditImageUrl(url) {
+    if (url && url.trim()) {
+        document.getElementById('edit_image_url').value = url.trim();
+        document.getElementById('edit_image_preview').src = url.trim();
+    }
+}
+
+// Apply image URL button
+function applyImageUrl() {
+    const url = document.getElementById('edit_image_url_input').value.trim();
+    if (url && url.startsWith('http')) {
+        document.getElementById('edit_image_url').value = url;
+        document.getElementById('edit_image_preview').src = url;
+        Swal.fire({
+            title: 'Image Updated!',
+            icon: 'success',
+            confirmButtonColor: '#A4B8A4',
+            timer: 1500
+        });
+    } else {
+        Swal.fire({
+            title: 'Invalid URL',
+            text: 'Please enter a valid image URL starting with http:// or https://',
+            icon: 'warning',
+            confirmButtonColor: '#A4B8A4'
+        });
+    }
 }
 
 function openEditUploadWidget() {
@@ -457,6 +498,7 @@ function openEditUploadWidget() {
         if (!error && result && result.event === "success") {
             const imageUrl = result.info.secure_url;
             document.getElementById('edit_image_url').value = imageUrl;
+            document.getElementById('edit_image_url_input').value = imageUrl;
             document.getElementById('edit_image_preview').src = imageUrl;
             
             Swal.fire({

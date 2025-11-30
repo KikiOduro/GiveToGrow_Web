@@ -49,9 +49,6 @@ $schools = $db->db_fetch_all("SELECT school_id, school_name, location FROM schoo
                 },
             },
         }
-        
-        </script>
-    <style>
     </script>
     <style>
         .material-symbols-outlined {
@@ -259,7 +256,7 @@ $schools = $db->db_fetch_all("SELECT school_id, school_name, location FROM schoo
                         </label>
                         
                         <!-- Hidden input to store the image URL -->
-                        <input type="hidden" id="image_url" name="image_url" required/>
+                        <input type="hidden" id="image_url" name="image_url" value=""/>
                         
                         <!-- Upload Button -->
                         <div id="upload-container" class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-primary transition-colors cursor-pointer" onclick="openUploadWidget()">
@@ -364,6 +361,9 @@ function openUploadWidget() {
                 confirmButtonColor: '#A4B8A4',
                 timer: 2000
             });
+            
+            // Debug: log to console
+            console.log('Image URL set to:', imageUrl);
         }
     });
 }
@@ -383,17 +383,23 @@ function removeImage() {
     document.getElementById('upload-container').classList.remove('border-solid', 'border-primary');
 }
 
-// Form validation
+// Form validation - runs before submit
 document.querySelector('form').addEventListener('submit', function(e) {
-    const imageUrl = document.getElementById('image_url').value;
-    if (!imageUrl) {
+    const imageUrlField = document.getElementById('image_url');
+    const imageUrl = imageUrlField.value;
+    
+    console.log('Form submitting with image_url:', imageUrl); // Debug
+    
+    // Check if URL is valid (must start with http)
+    if (!imageUrl || !imageUrl.startsWith('http')) {
         e.preventDefault();
         Swal.fire({
             title: 'Image Required',
-            text: 'Please upload an image for the school need.',
+            text: 'Please upload an image for the school need. Click the upload area and select or paste an image.',
             icon: 'warning',
             confirmButtonColor: '#A4B8A4'
         });
+        return false;
     }
 });
 </script>
