@@ -254,8 +254,8 @@ if ($category_filter && $category_filter != 'all') {
                     <div class="bg-primary h-2.5 rounded-full" style="width: <?php echo $progress; ?>%"></div>
                 </div>
                 <div class="flex justify-between text-xs font-medium text-gray-500 dark:text-gray-400 mb-4">
-                    <span>$<?php echo number_format($school['amount_raised'], 0); ?> Raised</span>
-                    <span>$<?php echo number_format($school['fundraising_goal'], 0); ?> Goal</span>
+                    <span>₵<?php echo number_format($school['amount_raised'], 0); ?> Raised</span>
+                    <span>₵<?php echo number_format($school['fundraising_goal'], 0); ?> Goal</span>
                 </div>
                 <div class="flex gap-2 mt-auto">
                     <a href="school_detail.php?id=<?php echo $school['school_id']; ?>" class="flex-1 flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-primary/20 text-primary dark:bg-primary/30 dark:text-background-light text-sm font-bold leading-normal tracking-[0.015em] hover:bg-primary/30 dark:hover:bg-primary/40">View School</a>

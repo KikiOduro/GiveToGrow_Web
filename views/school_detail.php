@@ -231,9 +231,9 @@ try {
         </div>
         <p class="text-neutral-500 dark:text-neutral-400 text-sm font-normal leading-normal">
             <span class="font-bold text-neutral-800 dark:text-neutral-200">
-                $<?php echo number_format($school['amount_raised'], 2); ?> raised
+                ₵<?php echo number_format($school['amount_raised'], 2); ?> raised
             </span> 
-            of $<?php echo number_format($school['fundraising_goal'], 2); ?>
+            of ₵<?php echo number_format($school['fundraising_goal'], 2); ?>
         </p>
     </div>
     
@@ -275,7 +275,7 @@ try {
                         <?php echo htmlspecialchars($need['item_name']); ?>
                     </p>
                     <p class="text-neutral-500 dark:text-neutral-400 text-sm">
-                        $<?php echo number_format($need['unit_price'], 2); ?> 
+                        ₵<?php echo number_format($need['unit_price'], 2); ?> 
                         <?php if ($need['quantity_needed'] > 1): ?>
                             per item (<?php echo $need['quantity_needed']; ?> needed)
                         <?php else: ?>
@@ -315,7 +315,7 @@ try {
     <div class="max-w-2xl mx-auto px-6 py-4 flex justify-between items-center">
         <div>
             <p class="font-bold text-lg text-neutral-800 dark:text-neutral-100">
-                $<?php echo number_format($cart_total, 2); ?>
+                ₵<?php echo number_format($cart_total, 2); ?>
             </p>
             <p class="text-sm text-neutral-500 dark:text-neutral-400">
                 <?php echo $cart_count; ?> <?php echo $cart_count == 1 ? 'item' : 'items'; ?> in cart

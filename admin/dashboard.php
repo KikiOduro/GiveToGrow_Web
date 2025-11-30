@@ -157,7 +157,7 @@ $recent_schools = $db->db_fetch_all("SELECT * FROM schools ORDER BY created_at D
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Total Raised</p>
-                            <p class="text-3xl font-bold text-[#131514] dark:text-background-light">$<?php echo number_format($total_raised['total'] ?? 0, 0); ?></p>
+                            <p class="text-3xl font-bold text-[#131514] dark:text-background-light">₵<?php echo number_format($total_raised['total'] ?? 0, 0); ?></p>
                             <p class="text-xs text-gray-500 mt-1">All schools</p>
                         </div>
                         <div class="w-12 h-12 bg-green-100 dark:bg-green-900/20 rounded-lg flex items-center justify-center">
@@ -217,7 +217,7 @@ $recent_schools = $db->db_fetch_all("SELECT * FROM schools ORDER BY created_at D
                                     <div class="text-xs text-gray-500"><?php echo htmlspecialchars($school['country']); ?></div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-700 dark:text-gray-300">$<?php echo number_format($school['amount_raised'], 0); ?> / $<?php echo number_format($school['fundraising_goal'], 0); ?></div>
+                                    <div class="text-sm text-gray-700 dark:text-gray-300">₵<?php echo number_format($school['amount_raised'], 0); ?> / ₵<?php echo number_format($school['fundraising_goal'], 0); ?></div>
                                     <div class="w-24 bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 mt-1">
                                         <div class="bg-primary h-1.5 rounded-full" style="width: <?php echo min(100, $progress); ?>%"></div>
                                     </div>

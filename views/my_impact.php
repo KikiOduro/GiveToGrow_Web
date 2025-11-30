@@ -201,7 +201,7 @@ $donation_history = $db->db_fetch_all($history_query, [$user_id]);
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
                     <div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-xl p-6 bg-white dark:bg-background-dark/50 border border-black/10 dark:border-white/10">
                         <p class="text-[#60826b] dark:text-primary/80 text-base font-medium leading-normal">Total Amount Donated</p>
-                        <p class="text-[#131514] dark:text-background-light tracking-light text-3xl font-bold leading-tight">$<?php echo number_format($total_donated, 0); ?></p>
+                        <p class="text-[#131514] dark:text-background-light tracking-light text-3xl font-bold leading-tight">₵<?php echo number_format($total_donated, 0); ?></p>
                     </div>
                     <div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-xl p-6 bg-white dark:bg-background-dark/50 border border-black/10 dark:border-white/10">
                         <p class="text-[#60826b] dark:text-primary/80 text-base font-medium leading-normal">Schools Supported</p>
@@ -278,7 +278,7 @@ $donation_history = $db->db_fetch_all($history_query, [$user_id]);
                             <tr class="border-b border-black/10 dark:border-white/10">
                                 <td class="px-6 py-4 whitespace-nowrap"><?php echo date('Y-m-d', strtotime($donation['created_at'])); ?></td>
                                 <td class="px-6 py-4 font-medium text-[#131514] dark:text-background-light"><?php echo htmlspecialchars($donation['school_name'] ?? 'N/A'); ?></td>
-                                <td class="px-6 py-4">$<?php echo number_format($donation['amount'], 2); ?></td>
+                                <td class="px-6 py-4">₵<?php echo number_format($donation['amount'], 2); ?></td>
                                 <td class="px-6 py-4"><?php echo htmlspecialchars($donation['items'] ?? 'General Donation'); ?></td>
                                 <td class="px-6 py-4">
                                     <span class="inline-flex items-center bg-<?php echo $status_class; ?>-100 dark:bg-<?php echo $status_class; ?>-900/50 text-<?php echo $status_class; ?>-800 dark:text-<?php echo $status_class; ?>-300 text-xs font-medium px-2.5 py-0.5 rounded-full">

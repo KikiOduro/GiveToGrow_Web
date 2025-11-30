@@ -181,7 +181,7 @@ function getPriorityBadge($school_id, $db) {
 <?php if ($hero_school): ?>
 <div class="absolute -bottom-6 -right-6 bg-card-light dark:bg-card-dark p-4 rounded-lg shadow-xl w-64 border border-border-light dark:border-border-dark">
 <p class="text-sm font-bold mb-1"><?php echo htmlspecialchars($hero_school['school_name']); ?></p>
-<p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Raised: $<?php echo number_format($hero_school['amount_raised'], 0); ?> / $<?php echo number_format($hero_school['fundraising_goal'], 0); ?></p>
+<p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Raised: ₵<?php echo number_format($hero_school['amount_raised'], 0); ?> / ₵<?php echo number_format($hero_school['fundraising_goal'], 0); ?></p>
 <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
 <div class="bg-primary h-2.5 rounded-full" style="width: <?php echo $hero_percentage; ?>%"></div>
 </div>
@@ -268,8 +268,8 @@ if (!empty($featured_schools)) {
         <p class="text-sm text-gray-600 dark:text-gray-400 flex-grow mb-4"><?php echo htmlspecialchars(substr($school['description'], 0, 100)) . (strlen($school['description']) > 100 ? '...' : ''); ?></p>
         <div class="mb-4">
             <div class="flex justify-between text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
-                <span>$<?php echo number_format($school['amount_raised'], 0); ?> raised</span>
-                <span>$<?php echo number_format($school['fundraising_goal'], 0); ?> goal</span>
+                <span>₵<?php echo number_format($school['amount_raised'], 0); ?> raised</span>
+                <span>₵<?php echo number_format($school['fundraising_goal'], 0); ?> goal</span>
             </div>
             <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                 <div class="bg-primary h-2 rounded-full" style="width: <?php echo $percentage; ?>%;"></div>

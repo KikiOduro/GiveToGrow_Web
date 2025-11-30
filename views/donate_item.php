@@ -143,7 +143,7 @@ $remaining = $need['quantity_needed'] - $quantity_fulfilled;
                         </p>
                     </div>
                     <p class="text-primary text-2xl font-bold leading-tight pt-1">
-                        $<?php echo number_format($need['unit_price'], 2); ?>
+                        ₵<?php echo number_format($need['unit_price'], 2); ?>
                     </p>
                 </div>
                 
