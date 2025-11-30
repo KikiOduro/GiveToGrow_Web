@@ -261,44 +261,39 @@ $schools = $db->db_fetch_all("SELECT school_id, school_name, location FROM schoo
                         <!-- Hidden input to store the image URL -->
                         <input type="hidden" id="image_url" name="image_url" value=""/>
                         
-                        <!-- Upload Button -->
-                        <div id="upload-container" class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-primary transition-colors cursor-pointer" onclick="openUploadWidget()">
-                            <div id="upload-placeholder">
-                                <span class="material-symbols-outlined text-4xl text-gray-400 mb-2">cloud_upload</span>
-                                <p class="text-gray-600 dark:text-gray-400 font-medium">Click to upload an image</p>
-                                <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">Supports: JPG, PNG, GIF, WEBP (Max 10MB)</p>
-                            </div>
-                            
-                            <!-- Preview (hidden by default) -->
-                            <div id="image-preview" class="hidden">
-                                <img id="preview-img" src="" alt="Preview" class="max-h-48 mx-auto rounded-lg shadow-md" onerror="this.src='https://placehold.co/200x200/A4B8A4/white?text=Invalid+URL'"/>
-                                <p id="preview-name" class="text-sm text-gray-600 dark:text-gray-400 mt-2"></p>
-                                <button type="button" onclick="event.stopPropagation(); removeImage();" class="mt-2 text-red-500 hover:text-red-700 text-sm flex items-center gap-1 mx-auto">
-                                    <span class="material-symbols-outlined text-lg">delete</span>
-                                    Remove Image
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <!-- Alternative: Direct URL input -->
-                        <div class="mt-3">
-                            <label class="flex items-center gap-2 text-sm text-gray-500 cursor-pointer">
-                                <input type="checkbox" id="use-url-input" onchange="toggleUrlInput()" class="rounded border-gray-300"/>
-                                Or enter image URL directly
-                            </label>
-                            <div id="url-input-container" class="hidden mt-2 flex gap-2">
+                        <!-- Direct URL Input (Primary Option) -->
+                        <div class="mb-4">
+                            <label class="block text-sm text-gray-600 dark:text-gray-400 mb-2">Paste image URL from the web:</label>
+                            <div class="flex gap-2">
                                 <input type="url" id="direct-url-input" 
-                                       class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-sm"
-                                       placeholder="https://example.com/image.jpg"
-                                       oninput="previewDirectUrl(this.value)"/>
-                                <button type="button" onclick="confirmDirectUrl()" 
-                                        class="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-opacity-90">
+                                       class="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-[#131514] dark:text-background-light focus:ring-2 focus:ring-primary focus:border-transparent"
+                                       placeholder="https://example.com/image.jpg"/>
+                                <button type="button" onclick="setImageUrl()" 
+                                        class="px-6 py-3 bg-primary text-white rounded-lg font-bold hover:bg-opacity-90">
                                     Set Image
                                 </button>
                             </div>
                         </div>
                         
-                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Upload via Cloudinary or paste an image URL directly</p>
+                        <!-- Image Preview -->
+                        <div id="image-preview-container" class="hidden border-2 border-solid border-primary rounded-lg p-4 text-center">
+                            <img id="preview-img" src="" alt="Preview" class="max-h-48 mx-auto rounded-lg shadow-md" onerror="this.src='https://placehold.co/200x200/ef4444/white?text=Invalid+URL'"/>
+                            <p id="preview-name" class="text-sm text-green-600 dark:text-green-400 mt-2 font-medium">✓ Image URL set</p>
+                            <button type="button" onclick="removeImage();" class="mt-2 text-red-500 hover:text-red-700 text-sm flex items-center gap-1 mx-auto">
+                                <span class="material-symbols-outlined text-lg">delete</span>
+                                Remove Image
+                            </button>
+                        </div>
+                        
+                        <!-- Cloudinary Upload (Secondary Option) -->
+                        <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                            <p class="text-sm text-gray-500 mb-2">Or upload from your computer:</p>
+                            <button type="button" onclick="openUploadWidget()" 
+                                    class="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800">
+                                <span class="material-symbols-outlined">cloud_upload</span>
+                                Upload via Cloudinary
+                            </button>
+                        </div>
                     </div>
                 </div>
                 
@@ -319,140 +314,19 @@ $schools = $db->db_fetch_all("SELECT school_id, school_name, location FROM schoo
 </div>
 
 <script>
-// Cloudinary configuration
-// ⚠️ IMPORTANT: Replace 'YOUR_CLOUD_NAME' with your actual Cloudinary cloud name
-// You can find this in your Cloudinary dashboard at https://cloudinary.com/console
+// Cloudinary configuration (optional - for file uploads)
 const CLOUDINARY_CLOUD_NAME = 'dlih7wpyw';
 const CLOUDINARY_UPLOAD_PRESET = 'givetogrow_unsigned';
 
-function openUploadWidget() {
-    cloudinary.openUploadWidget({
-        cloudName: CLOUDINARY_CLOUD_NAME,
-        uploadPreset: CLOUDINARY_UPLOAD_PRESET,
-        sources: ['local', 'url', 'camera'],
-        multiple: false,
-        maxFiles: 1,
-        maxFileSize: 10000000, // 10MB
-        resourceType: 'image',
-        clientAllowedFormats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
-        cropping: true,
-        croppingAspectRatio: 1,
-        croppingShowDimensions: true,
-        folder: 'givetogrow/needs',
-        styles: {
-            palette: {
-                window: "#FFFFFF",
-                windowBorder: "#A4B8A4",
-                tabIcon: "#A4B8A4",
-                menuIcons: "#5A616A",
-                textDark: "#000000",
-                textLight: "#FFFFFF",
-                link: "#A4B8A4",
-                action: "#A4B8A4",
-                inactiveTabIcon: "#9CA3AF",
-                error: "#EF4444",
-                inProgress: "#A4B8A4",
-                complete: "#10B981",
-                sourceBg: "#F7F7F7"
-            },
-            fonts: {
-                default: { active: true }
-            }
-        }
-    }, (error, result) => {
-        if (error) {
-            console.error('Cloudinary error:', error);
-            Swal.fire({
-                title: 'Upload Error',
-                text: 'Failed to upload image. Try using the direct URL option instead.',
-                icon: 'error',
-                confirmButtonColor: '#A4B8A4'
-            });
-            return;
-        }
-        
-        if (result && result.event === "success") {
-            // Get the secure URL
-            const imageUrl = result.info.secure_url;
-            const fileName = result.info.original_filename + '.' + result.info.format;
-            
-            console.log('Image uploaded:', imageUrl); // Debug log
-            
-            // Update the hidden input
-            document.getElementById('image_url').value = imageUrl;
-            
-            // Show preview
-            document.getElementById('upload-placeholder').classList.add('hidden');
-            document.getElementById('image-preview').classList.remove('hidden');
-            document.getElementById('preview-img').src = imageUrl;
-            document.getElementById('preview-name').textContent = fileName;
-            
-            // Update container style
-            document.getElementById('upload-container').classList.remove('border-dashed');
-            document.getElementById('upload-container').classList.add('border-solid', 'border-primary');
-            
-            // Hide direct URL input if it was shown
-            document.getElementById('use-url-input').checked = false;
-            document.getElementById('direct-url-input').classList.add('hidden');
-            
-            Swal.fire({
-                title: 'Image Uploaded!',
-                text: 'Your image has been uploaded successfully.',
-                icon: 'success',
-                confirmButtonColor: '#A4B8A4',
-                timer: 2000
-            });
-        }
-    });
-}
-
-function removeImage() {
-    // Clear the hidden input
-    document.getElementById('image_url').value = '';
-    
-    // Hide preview, show placeholder
-    document.getElementById('upload-placeholder').classList.remove('hidden');
-    document.getElementById('image-preview').classList.add('hidden');
-    document.getElementById('preview-img').src = '';
-    document.getElementById('preview-name').textContent = '';
-    
-    // Reset container style
-    document.getElementById('upload-container').classList.add('border-dashed');
-    document.getElementById('upload-container').classList.remove('border-solid', 'border-primary');
-    
-    // Clear direct URL input too
-    document.getElementById('direct-url-input').value = '';
-}
-
-// Toggle direct URL input visibility
-function toggleUrlInput() {
-    const checkbox = document.getElementById('use-url-input');
-    const urlContainer = document.getElementById('url-input-container');
-    
-    if (checkbox.checked) {
-        urlContainer.classList.remove('hidden');
-        document.getElementById('direct-url-input').focus();
-    } else {
-        urlContainer.classList.add('hidden');
-    }
-}
-
-// Preview the direct URL as user types
-function previewDirectUrl(url) {
-    if (url && url.trim() && (url.startsWith('http://') || url.startsWith('https://'))) {
-        // Show a temporary preview
-        document.getElementById('preview-img').src = url.trim();
-    }
-}
-
-// Confirm and set the direct URL
-function confirmDirectUrl() {
-    const url = document.getElementById('direct-url-input').value.trim();
+// Set image from URL input
+function setImageUrl() {
+    const urlInput = document.getElementById('direct-url-input');
+    const url = urlInput.value.trim();
     
     if (!url) {
         Swal.fire({
             title: 'URL Required',
-            text: 'Please enter an image URL.',
+            text: 'Please paste an image URL.',
             icon: 'warning',
             confirmButtonColor: '#A4B8A4'
         });
@@ -473,14 +347,8 @@ function confirmDirectUrl() {
     document.getElementById('image_url').value = url;
     
     // Show preview
-    document.getElementById('upload-placeholder').classList.add('hidden');
-    document.getElementById('image-preview').classList.remove('hidden');
+    document.getElementById('image-preview-container').classList.remove('hidden');
     document.getElementById('preview-img').src = url;
-    document.getElementById('preview-name').textContent = 'Image from URL';
-    
-    // Update container style
-    document.getElementById('upload-container').classList.remove('border-dashed');
-    document.getElementById('upload-container').classList.add('border-solid', 'border-primary');
     
     Swal.fire({
         title: 'Image Set!',
@@ -489,27 +357,64 @@ function confirmDirectUrl() {
         confirmButtonColor: '#A4B8A4',
         timer: 1500
     });
-    
-    console.log('Image URL set to:', url); // Debug log
 }
 
-// Set image URL from direct input (legacy function for compatibility)
-function setDirectUrl(url) {
-    if (url && url.trim()) {
-        confirmDirectUrl();
+// Remove image
+function removeImage() {
+    document.getElementById('image_url').value = '';
+    document.getElementById('direct-url-input').value = '';
+    document.getElementById('image-preview-container').classList.add('hidden');
+    document.getElementById('preview-img').src = '';
+}
+
+// Cloudinary upload (optional)
+function openUploadWidget() {
+    if (typeof cloudinary === 'undefined') {
+        Swal.fire({
+            title: 'Upload Not Available',
+            text: 'Please use the URL input instead to add an image.',
+            icon: 'info',
+            confirmButtonColor: '#A4B8A4'
+        });
+        return;
     }
+    
+    cloudinary.openUploadWidget({
+        cloudName: CLOUDINARY_CLOUD_NAME,
+        uploadPreset: CLOUDINARY_UPLOAD_PRESET,
+        sources: ['local', 'url', 'camera'],
+        multiple: false,
+        maxFiles: 1,
+        resourceType: 'image',
+        folder: 'givetogrow/needs'
+    }, (error, result) => {
+        if (!error && result && result.event === "success") {
+            const imageUrl = result.info.secure_url;
+            
+            document.getElementById('image_url').value = imageUrl;
+            document.getElementById('direct-url-input').value = imageUrl;
+            document.getElementById('image-preview-container').classList.remove('hidden');
+            document.getElementById('preview-img').src = imageUrl;
+            
+            Swal.fire({
+                title: 'Image Uploaded!',
+                icon: 'success',
+                confirmButtonColor: '#A4B8A4',
+                timer: 1500
+            });
+        }
+    });
 }
 
 // Form validation
 document.querySelector('form').addEventListener('submit', function(e) {
     const imageUrl = document.getElementById('image_url').value;
-    console.log('Submitting with image URL:', imageUrl); // Debug log
     
     if (!imageUrl || imageUrl.trim() === '') {
         e.preventDefault();
         Swal.fire({
             title: 'Image Required',
-            text: 'Please upload an image or enter an image URL for the school need.',
+            text: 'Please set an image URL before submitting.',
             icon: 'warning',
             confirmButtonColor: '#A4B8A4'
         });
