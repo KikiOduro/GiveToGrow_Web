@@ -96,9 +96,7 @@ if (!$donation_history) {
 }
 
 // Fetch recent updates from schools the user has donated to
-// Note: This requires the school_updates table to exist
 $recent_updates = [];
-/*
 $updates_query = "
     SELECT su.*, s.school_name, s.image_url as school_image
     FROM school_updates su
@@ -112,8 +110,10 @@ $updates_query = "
     ORDER BY su.created_at DESC
     LIMIT 5
 ";
-$recent_updates = $db->db_fetch_all($updates_query, [$user_id]);
-*/
+$result = $db->db_fetch_all($updates_query, [$user_id]);
+if ($result) {
+    $recent_updates = $result;
+}
 ?>
 <!DOCTYPE html>
 <html class="light" lang="en">
