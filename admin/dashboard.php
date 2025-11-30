@@ -13,8 +13,8 @@ $total_needs = $db->db_fetch_one("SELECT COUNT(*) as count FROM school_needs");
 $active_needs = $db->db_fetch_one("SELECT COUNT(*) as count FROM school_needs WHERE status = 'active'");
 $total_raised = $db->db_fetch_one("SELECT SUM(amount_raised) as total FROM schools");
 
-// Get recent schools
-$recent_schools = $db->db_fetch_all("SELECT * FROM schools ORDER BY created_at DESC LIMIT 5");
+// Get recent schools (show all schools, ordered by most recent)
+$recent_schools = $db->db_fetch_all("SELECT * FROM schools ORDER BY created_at DESC");
 ?>
 <!DOCTYPE html>
 <html class="light" lang="en">
@@ -41,9 +41,6 @@ $recent_schools = $db->db_fetch_all("SELECT * FROM schools ORDER BY created_at D
                 },
             },
         }
-        
-        </script>
-    <style>
     </script>
     <style>
         .material-symbols-outlined {
@@ -182,10 +179,10 @@ $recent_schools = $db->db_fetch_all("SELECT * FROM schools ORDER BY created_at D
                 </div>
             </div>
             
-            <!-- Recent Schools Table -->
+            <!-- Schools Table -->
             <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                    <h2 class="text-xl font-bold text-[#131514] dark:text-background-light">Recent Schools</h2>
+                    <h2 class="text-xl font-bold text-[#131514] dark:text-background-light">All Schools</h2>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full">
