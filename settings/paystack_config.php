@@ -1,36 +1,50 @@
 <?php
 /**
- * Paystack Configuration for GiveToGrow
- * Secure payment gateway settings
+ * Paystack Payment Gateway Configuration
+ * 
+ * This file handles all the setup for Paystack, our payment processor.
+ * Paystack is popular in Africa and supports mobile money, cards, and bank transfers.
+ * 
+ * IMPORTANT: These are TEST keys. Before going live, you need to:
+ * 1. Replace with your LIVE keys from the Paystack dashboard
+ * 2. Change APP_ENVIRONMENT to 'live'
+ * 3. Update APP_BASE_URL to your production domain
+ * 
+ * Get your API keys at: https://dashboard.paystack.com/#/settings/developers
  */
 
-// Paystack API Keys
+// API Keys - these are TEST keys, safe for development
+// In production, store these in environment variables for security
 define('PAYSTACK_SECRET_KEY', 'sk_test_12af6ed3d10227f1df73ab146a6f12805004ff2f');
 define('PAYSTACK_PUBLIC_KEY', 'pk_test_06b09b657a6299074b013e4b1d58e036618933fe');
 
-// Paystack URLs
+// Paystack API endpoints
 define('PAYSTACK_API_URL', 'https://api.paystack.co');
 define('PAYSTACK_INIT_ENDPOINT', PAYSTACK_API_URL . '/transaction/initialize');
 define('PAYSTACK_VERIFY_ENDPOINT', PAYSTACK_API_URL . '/transaction/verify/');
 
-// Application Configuration
-define('APP_ENVIRONMENT', 'test'); // Change to 'live' in production
-define('APP_BASE_URL', 'http://169.239.251.102:442/~akua.oduro'); // Live server URL
-define('PAYSTACK_CALLBACK_URL', APP_BASE_URL . '/views/paystack_callback.php'); // Callback after payment
+// App settings - update these for production
+define('APP_ENVIRONMENT', 'test'); // Change to 'live' when ready for real payments
+define('APP_BASE_URL', 'http://169.239.251.102:442/~akua.oduro');
+define('PAYSTACK_CALLBACK_URL', APP_BASE_URL . '/views/paystack_callback.php');
 
 /**
- * Initialize a Paystack transaction
+ * Start a new payment transaction with Paystack
  * 
- * @param float $amount Amount in USD (will be converted to pesewas/cents)
- * @param string $email Customer email
- * @param string $reference Optional reference
- * @return array Response with 'status' and 'data' containing authorization_url
+ * This sends the donation amount to Paystack and gets back a URL where
+ * the user can complete their payment (enter card details, mobile money, etc.)
+ * 
+ * @param float $amount The donation amount in GHS (Ghana Cedis)
+ * @param string $email The donor's email - Paystack uses this for receipts
+ * @param string $reference Optional unique ID for this transaction
+ * @return array Response containing authorization_url for redirect
  */
 function paystack_initialize_transaction($amount, $email, $reference = null) {
+    // Generate a unique reference if none provided
     $reference = $reference ?? 'GTG-' . uniqid();
     
-    // Convert USD to cents (1 USD = 100 cents)
-    // For Ghana (GHS): 1 GHS = 100 pesewas
+    // Paystack expects amount in pesewas (1 GHS = 100 pesewas)
+    // Similar to how Stripe uses cents
     $amount_in_cents = round($amount * 100);
     
     $data = [
@@ -58,10 +72,14 @@ function paystack_initialize_transaction($amount, $email, $reference = null) {
 }
 
 /**
- * Verify a Paystack transaction
+ * Verify that a payment was actually successful
  * 
- * @param string $reference Transaction reference
- * @return array Response with transaction details
+ * After a user completes payment, Paystack redirects them back to our site.
+ * We MUST verify the transaction with Paystack's API to confirm it went through.
+ * Never trust the redirect alone - always verify!
+ * 
+ * @param string $reference The transaction reference we created earlier
+ * @return array Full transaction details including amount and status
  */
 function paystack_verify_transaction($reference) {
     $response = paystack_api_request('GET', PAYSTACK_VERIFY_ENDPOINT . $reference);
@@ -70,22 +88,26 @@ function paystack_verify_transaction($reference) {
 }
 
 /**
- * Make a request to Paystack API
+ * Make a request to Paystack's API
  * 
- * @param string $method HTTP method (GET, POST, etc)
- * @param string $url Full API endpoint URL
- * @param array $data Optional data to send
- * @return array API response decoded as array
+ * This is the workhorse function that actually talks to Paystack.
+ * It handles authentication, JSON encoding, and error handling.
+ * 
+ * @param string $method HTTP method - GET for verify, POST for initialize
+ * @param string $url The full Paystack API endpoint
+ * @param array $data Optional data payload for POST requests
+ * @return array Decoded JSON response from Paystack
  */
 function paystack_api_request($method, $url, $data = null) {
     $ch = curl_init();
     
+    // Set up the request
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 30);  // Don't wait forever
     
-    // Set headers
+    // Authenticate with our secret key
     $headers = [
         'Authorization: Bearer ' . PAYSTACK_SECRET_KEY,
         'Content-Type: application/json'

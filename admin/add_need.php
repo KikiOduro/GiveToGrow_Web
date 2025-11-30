@@ -1,4 +1,15 @@
 <?php
+/**
+ * Admin Panel: Add School Need
+ * 
+ * This page allows administrators to add new items/needs for schools.
+ * Each need represents something a school requires - like textbooks,
+ * computers, sports equipment, etc. - that donors can contribute towards.
+ * 
+ * The form collects item details including name, description, category,
+ * price per unit, quantity needed, and an image URL.
+ */
+
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -10,15 +21,15 @@ require_once __DIR__ . '/../settings/db_class.php';
 $db = new db_connection();
 $admin_name = isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : 'Admin';
 
-// Handle success/error messages from session
+// Check for any success/error messages from previous actions
 $success_message = isset($_SESSION['success_message']) ? $_SESSION['success_message'] : '';
 $error_message = isset($_SESSION['error_message']) ? $_SESSION['error_message'] : '';
 unset($_SESSION['success_message'], $_SESSION['error_message']);
 
-// Get school_id from URL if present
+// If coming from add_school, pre-select that school in the dropdown
 $preselected_school = isset($_GET['school_id']) ? intval($_GET['school_id']) : 0;
 
-// Fetch all schools for dropdown
+// Get all schools for the dropdown menu
 $schools = $db->db_fetch_all("SELECT school_id, school_name, location FROM schools ORDER BY school_name ASC");
 ?>
 <!DOCTYPE html>

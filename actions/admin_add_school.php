@@ -1,22 +1,32 @@
 <?php
+/**
+ * Admin: Add New School
+ * 
+ * Handles the form submission when an admin adds a new school to the platform.
+ * Validates all required fields and inserts the school into the database.
+ * 
+ * After successful creation, redirects to add_need.php so the admin can
+ * immediately start adding items that the school needs.
+ */
+
 session_start();
 require_once __DIR__ . '/../settings/db_class.php';
 
-// Check admin authentication
+// Only admins can add schools - redirect everyone else
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
     $_SESSION['error_message'] = "Access denied. Admin privileges required.";
     header("Location: ../dashboard.php");
     exit();
 }
 
-// Validate form submission
+// This endpoint only accepts POST requests from the form
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     $_SESSION['error_message'] = "Invalid request method.";
     header("Location: ../admin/add_school.php");
     exit();
 }
 
-// Get form data
+// Grab and clean up all the form data
 $school_name = trim($_POST['school_name'] ?? '');
 $location = trim($_POST['location'] ?? '');
 $country = trim($_POST['country'] ?? '');

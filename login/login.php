@@ -1,4 +1,23 @@
 <?php
+/**
+ * Login Page
+ * 
+ * The main authentication page for users to sign in to their accounts.
+ * After successful login, users can donate, track their impact, and
+ * receive updates about schools they've supported.
+ * 
+ * Features:
+ * - Email/password authentication
+ * - Error message display for failed logins
+ * - Remembers email on failed attempts so users don't have to retype
+ * - Redirect support: can send users back to where they were before login
+ * - Password visibility toggle
+ * - Link to registration for new users
+ * 
+ * The form posts to ../actions/login_customer.php which handles
+ * the actual authentication.
+ */
+
 // Start session for flash messages + storing user info later
 if (session_status() !== PHP_SESSION_ACTIVE) {
   session_start();
@@ -9,6 +28,7 @@ $login_error = $_SESSION['login_error'] ?? '';
 $old_email   = $_SESSION['old_email'] ?? '';
 
 // Get redirect URL from query param or session
+// This lets us send users back to where they were trying to go
 $redirect = $_GET['redirect'] ?? ($_SESSION['redirect_after_login'] ?? '');
 
 // Clear them so they don't persist forever

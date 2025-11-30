@@ -1,12 +1,31 @@
 <?php
+/**
+ * Registration Page
+ * 
+ * Where new donors create their accounts. We keep registration simple
+ * with just email and password - we can collect more info later if needed.
+ * 
+ * Features:
+ * - Email/password registration with confirmation
+ * - Password visibility toggles for both fields
+ * - Error message display for validation failures
+ * - Redirect support: after registering, can send users where they wanted to go
+ * - Terms of Service and Privacy Policy links
+ * - Link to login for existing users
+ * 
+ * The form posts to ../actions/register_customer.php which validates
+ * the data and creates the user account.
+ */
+
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
 
+// Check if there was an error from a previous registration attempt
 $register_error = $_SESSION['register_error'] ?? '';
 unset($_SESSION['register_error']);
 
-// Get redirect URL from query param
+// Get redirect URL so we can send them there after registration
 $redirect = $_GET['redirect'] ?? '';
 
 // Simple escape helper

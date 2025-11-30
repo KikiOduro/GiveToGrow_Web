@@ -1,7 +1,18 @@
 <?php
+/**
+ * Get Cart Count
+ * 
+ * Quick AJAX endpoint to get the number of items in the user's cart.
+ * Used to update the cart badge/counter in the navigation bar without
+ * reloading the whole page.
+ * 
+ * Returns JSON with 'count' (total quantity of all items)
+ */
+
 session_start();
 header('Content-Type: application/json');
 
+// If not logged in, cart is empty
 if (!isset($_SESSION['user_id'])) {
     echo json_encode(['success' => false, 'count' => 0]);
     exit();
@@ -14,7 +25,7 @@ $user_id = $_SESSION['user_id'];
 try {
     $db = new db_connection();
     
-    // Get total quantity of items in cart
+    // Sum up all item quantities in the cart
     $query = "SELECT COALESCE(SUM(quantity), 0) as total_items FROM cart WHERE user_id = ?";
     $result = $db->db_fetch_one($query, [$user_id]);
     

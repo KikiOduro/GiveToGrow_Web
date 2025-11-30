@@ -1,9 +1,18 @@
 <?php
-// Fetch data from database for landing page
+/**
+ * Public Landing Page
+ * 
+ * The first page visitors see - our marketing/welcome page that showcases
+ * what GiveToGrow is all about. No login required! We want to inspire
+ * potential donors with impact stats, featured schools, and how-it-works info.
+ * 
+ * This is different from dashboard.php which is the logged-in home page.
+ */
+
 require_once '../settings/db_class.php';
 $db = new db_connection();
 
-// Fetch impact statistics
+// Pull some impressive numbers to show our platform's impact
 $students_query = "SELECT SUM(total_students) as total_students FROM schools WHERE status = 'active'";
 $students_result = $db->db_fetch_one($students_query);
 $total_students = $students_result['total_students'] ?? 0;
@@ -16,7 +25,7 @@ $regions_query = "SELECT COUNT(DISTINCT country) as total_regions FROM schools W
 $regions_result = $db->db_fetch_one($regions_query);
 $total_regions = $regions_result['total_regions'] ?? 0;
 
-// Fetch featured schools (3 most recent active schools)
+// Get 3 featured schools to showcase on the homepage
 $featured_query = "SELECT s.*, 
     (SELECT COUNT(*) FROM school_needs WHERE school_id = s.school_id AND status = 'active') as needs_count
     FROM schools s 

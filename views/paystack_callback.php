@@ -1,23 +1,28 @@
 <?php
 /**
- * Paystack Payment Callback Handler
- * This page is called after Paystack payment process
- * User is redirected here by Paystack after payment
+ * Paystack Payment Callback Page
+ * 
+ * After a user completes (or cancels) payment on Paystack's site,
+ * they get redirected back here. This page shows a loading spinner
+ * while we verify the payment with Paystack's API in the background.
+ * 
+ * If the payment is confirmed, we create donation records and redirect
+ * to the success page. If something went wrong, we show an error.
  */
 
 session_start();
 
-// Check if user is logged in
+// Must be logged in - you can't complete a payment without an account
 if (!isset($_SESSION['user_id'])) {
     header('Location: ../login/login.php');
     exit();
 }
 
-// Get reference from URL
+// Paystack sends back the reference in the URL
 $reference = isset($_GET['reference']) ? trim($_GET['reference']) : null;
 
 if (!$reference) {
-    // Payment cancelled or reference missing
+    // No reference = user probably hit back or cancelled
     header('Location: cart.php?error=cancelled');
     exit();
 }

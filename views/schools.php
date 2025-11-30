@@ -1,33 +1,42 @@
 <?php
+/**
+ * Browse Schools Page
+ * 
+ * The main discovery page where donors can explore all the schools
+ * on our platform. Supports filtering by item category and sorting
+ * by various criteria (most recent, closest to goal, etc.)
+ * 
+ * Open to guests so people can see what schools need help before
+ * creating an account. The donate buttons will prompt login.
+ */
+
 session_start();
 
-// Guest browsing allowed - no login required to view schools
-// Check if user is logged in (for personalized features)
+// Allow guest browsing - we want people to explore before signing up
 $is_logged_in = isset($_SESSION['user_id']);
 $user_name = $is_logged_in ? htmlspecialchars($_SESSION['user_name']) : 'Guest';
 $user_email = isset($_SESSION['user_email']) ? htmlspecialchars($_SESSION['user_email']) : '';
 
-// Fetch schools from database
 require_once __DIR__ . '/../settings/db_class.php';
 $db = new db_connection();
 
-// Get filter and sort parameters
+// Grab any filter/sort preferences from the URL
 $category_filter = isset($_GET['category']) ? $_GET['category'] : '';
 $sort_by = isset($_GET['sort']) ? $_GET['sort'] : 'recent';
 
-// Determine sort order based on selection
-$order_clause = 'ORDER BY s.created_at DESC'; // Default: Most Recent
+// Build the ORDER BY clause based on user's sort preference
+$order_clause = 'ORDER BY s.created_at DESC'; // Default: newest first
 switch ($sort_by) {
     case 'recent':
-        // Most Recent - based on when school was added
+        // Most recent schools added to the platform
         $order_clause = 'ORDER BY s.created_at DESC';
         break;
     case 'goal_closest':
-        // Closest to Goal (highest percentage funded)
+        // Schools that are almost fully funded - help them cross the finish line!
         $order_clause = 'ORDER BY (s.amount_raised / NULLIF(s.fundraising_goal, 0)) DESC';
         break;
     case 'goal_highest':
-        // Highest Fundraising Goal
+        // Schools with the biggest goals - major projects
         $order_clause = 'ORDER BY s.fundraising_goal DESC';
         break;
     case 'priority':

@@ -1,7 +1,17 @@
 <?php
+/**
+ * My Impact Dashboard
+ * 
+ * Shows donors a personalized view of all the good they've done!
+ * Displays total donations, number of schools supported, items funded,
+ * and a monthly giving chart. Also lists their donation history.
+ * 
+ * This page requires login since it shows user-specific data.
+ */
+
 session_start();
 
-// Check if user is logged in
+// Must be logged in to see your impact - redirect guests to login
 if (!isset($_SESSION['user_id'])) {
     header("Location: ../login/login.php");
     exit();
@@ -13,7 +23,7 @@ $db = new db_connection();
 $user_id = $_SESSION['user_id'];
 $user_name = htmlspecialchars($_SESSION['user_name'] ?? 'User');
 
-// Fetch total amount donated by this user
+// Calculate the total amount this user has donated
 $total_query = "
     SELECT COALESCE(SUM(amount), 0) as total_donated
     FROM donations
@@ -22,7 +32,7 @@ $total_query = "
 $total_result = $db->db_fetch_one($total_query, [$user_id]);
 $total_donated = $total_result['total_donated'] ?? 0;
 
-// Fetch number of schools supported
+// Count how many different schools they've supported
 $schools_query = "
     SELECT COUNT(DISTINCT school_id) as schools_count
     FROM donations
@@ -31,7 +41,7 @@ $schools_query = "
 $schools_result = $db->db_fetch_one($schools_query, [$user_id]);
 $schools_supported = $schools_result['schools_count'] ?? 0;
 
-// Fetch number of items funded
+// Count how many individual items they've funded
 $items_query = "
     SELECT COUNT(*) as items_count
     FROM donations

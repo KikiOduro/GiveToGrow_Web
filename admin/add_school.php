@@ -1,4 +1,15 @@
 <?php
+/**
+ * Admin Panel: Add New School
+ * 
+ * This page allows administrators to register new under-resourced schools
+ * onto the GiveToGrow platform. Schools added here become visible to donors
+ * who can then contribute to their specific needs.
+ * 
+ * The form collects school details including name, location, description,
+ * an image (uploaded via Cloudinary), student count, and fundraising goal.
+ */
+
 session_start();
 require_once __DIR__ . '/../settings/admin_check.php';
 require_once __DIR__ . '/../settings/db_class.php';
@@ -6,7 +17,7 @@ require_once __DIR__ . '/../settings/db_class.php';
 $db = new db_connection();
 $admin_name = isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : 'Admin';
 
-// Handle success/error messages from session
+// Check for any success/error messages from previous actions
 $success_message = isset($_SESSION['success_message']) ? $_SESSION['success_message'] : '';
 $error_message = isset($_SESSION['error_message']) ? $_SESSION['error_message'] : '';
 unset($_SESSION['success_message'], $_SESSION['error_message']);

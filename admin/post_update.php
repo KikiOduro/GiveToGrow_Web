@@ -1,4 +1,24 @@
 <?php
+/**
+ * Post School Update - Admin Page
+ * 
+ * Admins use this page to share progress updates with donors.
+ * When something good happens at a school (textbooks delivered,
+ * new equipment installed, milestone reached), we post an update here.
+ * 
+ * These updates show up on:
+ * - The school's detail page
+ * - The donor's "My Updates" page (if they donated to that school)
+ * - Can trigger email notifications to donors
+ * 
+ * Update types:
+ * - general: Regular news
+ * - milestone: Something big achieved
+ * - progress: Status update on ongoing work
+ * - completion: Project finished!
+ * - thank_you: Gratitude message to donors
+ */
+
 session_start();
 require_once __DIR__ . '/../settings/admin_check.php';
 require_once __DIR__ . '/../settings/db_class.php';
@@ -6,10 +26,10 @@ require_once __DIR__ . '/../settings/db_class.php';
 $db = new db_connection();
 $admin_name = isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : 'Admin';
 
-// Fetch all schools for dropdown
+// Get active schools for the dropdown - no point showing inactive ones
 $schools = $db->db_fetch_all("SELECT school_id, school_name FROM schools WHERE status = 'active' ORDER BY school_name");
 
-// Handle form submission
+// Handle the form when admin submits a new update
 $success_message = '';
 $error_message = '';
 

@@ -1,4 +1,17 @@
 <?php
+/**
+ * Manage Schools - Admin Page
+ * 
+ * This page lets admins see all registered schools at a glance.
+ * For each school, you can see location, student count, fundraising
+ * progress, and how many needs they have. From here admins can:
+ * - View any school's public page
+ * - Add new needs to a school
+ * - Delete schools (with confirmation)
+ * 
+ * The delete function uses AJAX with SweetAlert for a nice UX.
+ */
+
 session_start();
 require_once __DIR__ . '/../settings/admin_check.php';
 require_once __DIR__ . '/../settings/db_class.php';
@@ -6,7 +19,8 @@ require_once __DIR__ . '/../settings/db_class.php';
 $db = new db_connection();
 $admin_name = isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : 'Admin';
 
-// Get all schools with their needs count
+// Fetch schools along with their needs count in one query
+// Using LEFT JOIN so schools with no needs still show up
 $query = "SELECT s.*, 
           COUNT(sn.need_id) as total_needs,
           SUM(CASE WHEN sn.status = 'active' THEN 1 ELSE 0 END) as active_needs

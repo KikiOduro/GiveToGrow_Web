@@ -1,17 +1,25 @@
 <?php
+/**
+ * Main Dashboard / Landing Page
+ * 
+ * This is the home page of GiveToGrow! It showcases featured schools,
+ * impact statistics, and recent donations to inspire visitors to give.
+ * 
+ * Both guests and logged-in users can view this page. Logged-in users
+ * see personalized features like "View My Impact" if they've donated.
+ */
+
 session_start();
 
-// Guest browsing allowed - no login required to view dashboard/landing page
-// Check if user is logged in (for personalized features)
+// Allow guest browsing - we want people to see what we're about before signing up
 $is_logged_in = isset($_SESSION['user_id']);
 $user_name = $is_logged_in ? htmlspecialchars($_SESSION['user_name']) : 'Guest';
 $user_email = isset($_SESSION['user_email']) ? htmlspecialchars($_SESSION['user_email']) : '';
 
-// Fetch featured schools from database
 require_once __DIR__ . '/../settings/db_class.php';
 $db = new db_connection();
 
-// Fetch impact statistics
+// Grab some impressive stats to show visitors our platform's reach
 $students_query = "SELECT SUM(total_students) as total_students FROM schools WHERE status = 'active'";
 $students_result = $db->db_fetch_one($students_query);
 $total_students = $students_result['total_students'] ?? 0;
@@ -24,7 +32,7 @@ $regions_query = "SELECT COUNT(DISTINCT country) as total_regions FROM schools W
 $regions_result = $db->db_fetch_one($regions_query);
 $total_regions = $regions_result['total_regions'] ?? 0;
 
-// Fetch a recent donation for the hero section (optional)
+// Show a recent donation in the hero section - social proof that others are giving!
 $recent_donation_query = "
     SELECT d.donation_id, d.amount, d.created_at, d.is_anonymous,
            u.user_name, s.school_name, sn.item_name

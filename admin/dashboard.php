@@ -1,4 +1,18 @@
 <?php
+/**
+ * Admin Dashboard
+ * 
+ * This is the main hub for administrators. It gives a quick overview of
+ * how the platform is doing - total schools, needs, money raised, etc.
+ * Think of it as mission control for managing the donation platform.
+ * 
+ * Features:
+ * - Summary statistics cards (schools, needs, fundraising totals)
+ * - Quick action buttons to add schools or needs
+ * - Table of all schools with progress and status
+ * - Links to all admin functions in the sidebar
+ */
+
 session_start();
 require_once __DIR__ . '/../settings/admin_check.php';
 require_once __DIR__ . '/../settings/db_class.php';
@@ -6,7 +20,8 @@ require_once __DIR__ . '/../settings/db_class.php';
 $db = new db_connection();
 $admin_name = isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : 'Admin';
 
-// Get statistics
+// Pull together all the numbers we need for the dashboard cards
+// These queries are quick since they're just counting rows
 $total_schools = $db->db_fetch_one("SELECT COUNT(*) as count FROM schools");
 $active_schools = $db->db_fetch_one("SELECT COUNT(*) as count FROM schools WHERE status = 'active'");
 $total_needs = $db->db_fetch_one("SELECT COUNT(*) as count FROM school_needs");

@@ -1,11 +1,21 @@
 <?php
+/**
+ * School Detail Page
+ * 
+ * The main page for an individual school showing all their details
+ * and current needs. This is where donors can see exactly what items
+ * a school needs and add them to their cart.
+ * 
+ * Guests can browse but will be prompted to login/signup when they
+ * try to donate. We show them everything first to build interest!
+ */
+
 session_start();
 
-// Guest browsing allowed - no login required to view school details
-// Check if user is logged in (for cart and donation features)
+// Allow guest browsing - let people see the school before requiring login
 $is_logged_in = isset($_SESSION['user_id']);
 
-// Get school ID from URL
+// Which school are we looking at? Get ID from the URL
 $school_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
 if ($school_id <= 0) {
@@ -17,20 +27,21 @@ require_once __DIR__ . '/../settings/db_class.php';
 
 $db = new db_connection();
 
-// Fetch school details
+// Load up the school's info
 $school_query = "SELECT * FROM schools WHERE school_id = ? AND status = 'active'";
 $school = $db->db_fetch_one($school_query, [$school_id]);
 
+// School doesn't exist or isn't active? Send them back to browse
 if (!$school) {
     header("Location: schools.php");
     exit();
 }
 
-// Calculate progress percentage
+// How close are they to their fundraising goal?
 $progress = ($school['amount_raised'] / $school['fundraising_goal']) * 100;
-$progress = min(100, $progress); // Cap at 100%
+$progress = min(100, $progress); // Don't go over 100% on the progress bar
 
-// Fetch school needs
+// Get all the items this school needs, prioritized by urgency
 $needs_query = "SELECT * FROM school_needs WHERE school_id = ? AND status = 'active' ORDER BY priority DESC, created_at ASC";
 $needs = $db->db_fetch_all($needs_query, [$school_id]);
 

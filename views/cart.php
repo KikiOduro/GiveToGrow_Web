@@ -1,7 +1,16 @@
 <?php
+/**
+ * Shopping Cart View
+ * 
+ * Displays the user's donation cart with all the items they've selected.
+ * Users can update quantities, remove items, or proceed to checkout.
+ * 
+ * This page requires login since you need an account to save cart items.
+ */
+
 session_start();
 
-// Check if user is logged in
+// Must be logged in to view cart - redirect guests to login
 if (!isset($_SESSION['user_id'])) {
     header("Location: ../login/login.php");
     exit();
@@ -11,7 +20,7 @@ require_once __DIR__ . '/../settings/db_class.php';
 
 $db = new db_connection();
 
-// Get user information
+// Get user info from session
 $user_id = $_SESSION['user_id'];
 $user_name = isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : 'User';
 $user_email = isset($_SESSION['user_email']) ? htmlspecialchars($_SESSION['user_email']) : '';

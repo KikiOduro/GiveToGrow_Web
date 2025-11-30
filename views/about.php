@@ -1,15 +1,24 @@
 <?php
+/**
+ * About Page
+ * 
+ * Tells our story - why GiveToGrow exists and the impact we're making.
+ * Shows platform-wide statistics and explains the mission to connect
+ * donors directly with under-resourced schools in Ghana.
+ * 
+ * Open to everyone - both guests and logged-in users can learn about us.
+ */
+
 session_start();
 
-// Guest browsing allowed - no login required for about page
+// Allow guest browsing - we want everyone to learn about our mission
 $is_logged_in = isset($_SESSION['user_id']);
 $user_name = $is_logged_in ? htmlspecialchars($_SESSION['user_name']) : 'Guest';
 
-// Fetch impact statistics from database
 require_once __DIR__ . '/../settings/db_class.php';
 $db = new db_connection();
 
-// Total students reached
+// Pull some impressive stats to show our platform's reach
 $students_query = "SELECT SUM(total_students) as total_students FROM schools WHERE status = 'active'";
 $students_result = $db->db_fetch_one($students_query);
 $total_students = $students_result['total_students'] ?? 0;

@@ -1,13 +1,26 @@
 <?php
+/**
+ * Paystack Payment Initialization
+ * 
+ * This script kicks off the payment process with Paystack.
+ * It creates a transaction reference and returns an authorization URL
+ * where the user will complete their payment.
+ * 
+ * Expected JSON input:
+ * - amount: The donation amount in GHS
+ * - email: The donor's email address
+ * 
+ * Returns JSON with authorization_url on success, or error message on failure.
+ */
+
 header('Content-Type: application/json');
 session_start();
 
-// Include Paystack configuration
 require_once __DIR__ . '/../settings/paystack_config.php';
 
 error_log("=== PAYSTACK INITIALIZE TRANSACTION ===");
 
-// Check if user is logged in
+// User must be logged in to make a payment
 if (!isset($_SESSION['user_id'])) {
     echo json_encode([
         'status' => 'error',
@@ -16,7 +29,7 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-// Get POST data
+// Parse the JSON request body
 $input = json_decode(file_get_contents('php://input'), true);
 $amount = isset($input['amount']) ? floatval($input['amount']) : 0;
 $customer_email = isset($input['email']) ? trim($input['email']) : '';

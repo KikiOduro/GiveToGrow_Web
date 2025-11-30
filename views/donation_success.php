@@ -1,12 +1,23 @@
 <?php
+/**
+ * Donation Success Page
+ * 
+ * The feel-good page! Users land here after completing a donation.
+ * Shows a summary of everything they just donated, with confetti
+ * animation to celebrate their generosity.
+ * 
+ * Also provides a "Download Receipt" button and links to view impact.
+ */
+
 session_start();
 
-// Check if user is logged in
+// Must be logged in to see donation confirmation
 if (!isset($_SESSION['user_id'])) {
     header("Location: ../login/login.php");
     exit();
 }
 
+// Need a valid donation ID to show the receipt
 $donation_id = isset($_GET['donation_id']) ? intval($_GET['donation_id']) : 0;
 
 if ($donation_id <= 0) {
@@ -19,16 +30,17 @@ require_once __DIR__ . '/../settings/db_class.php';
 $db = new db_connection();
 $user_id = $_SESSION['user_id'];
 
-// First, get the transaction_date from the primary donation
+// Get the transaction timestamp so we can find all items from the same checkout
 $primary_donation_query = "SELECT transaction_date, donor_email FROM donations WHERE donation_id = ? AND user_id = ?";
 $primary_donation = $db->db_fetch_one($primary_donation_query, [$donation_id, $user_id]);
 
+// If donation doesn't exist or belongs to someone else, redirect
 if (!$primary_donation) {
     header("Location: dashboard.php");
     exit();
 }
 
-// Fetch ALL donations from the same transaction (same user, same transaction_date)
+// Get ALL donations from this transaction (user might have donated multiple items at once)
 $all_donations_query = "SELECT d.*, s.school_name, s.country, sn.item_name 
                         FROM donations d
                         JOIN schools s ON d.school_id = s.school_id
@@ -37,7 +49,7 @@ $all_donations_query = "SELECT d.*, s.school_name, s.country, sn.item_name
                         ORDER BY d.donation_id ASC";
 $donations = $db->db_fetch_all($all_donations_query, [$user_id, $primary_donation['transaction_date']]);
 
-// Calculate total amount
+// Add up the total and get a nice list of schools
 $total_amount = 0;
 $schools_list = [];
 foreach ($donations as $d) {
@@ -48,6 +60,7 @@ foreach ($donations as $d) {
 }
 
 $donor_email = $primary_donation['donor_email'];
+// Format schools nicely: "School A, School B and School C"
 $schools_text = count($schools_list) > 1 ? implode(', ', array_slice($schools_list, 0, -1)) . ' and ' . end($schools_list) : $schools_list[0];
 ?>
 <!DOCTYPE html>

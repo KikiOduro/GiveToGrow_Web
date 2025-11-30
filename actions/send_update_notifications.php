@@ -1,15 +1,28 @@
 <?php
 /**
  * Email Notification System for School Updates
- * This script sends email notifications to donors when schools post updates
+ * 
+ * When a school posts an update about their progress, this script sends
+ * email notifications to all donors who have contributed to that school.
+ * It's a great way to keep donors engaged and show them the impact of
+ * their contributions.
+ * 
+ * In production, you'd want to use a proper email service like SendGrid,
+ * Mailgun, or AWS SES instead of PHP's built-in mail() function.
  */
 
 require_once __DIR__ . '/../settings/db_class.php';
 
+/**
+ * Send email notifications to all donors of a school when an update is posted
+ * 
+ * @param int $update_id The ID of the school update to notify about
+ * @return int|false Number of emails sent, or false if update not found
+ */
 function sendUpdateNotifications($update_id) {
     $db = new db_connection();
     
-    // Fetch update details
+    // First, grab the update details so we know what we're notifying about
     $update_query = "
         SELECT su.*, s.school_name, s.image_url as school_image
         FROM school_updates su
@@ -22,7 +35,7 @@ function sendUpdateNotifications($update_id) {
         return false;
     }
     
-    // Fetch all donors who should receive this notification
+    // Find everyone who has donated to this school - they're the ones who care!
     $donors_query = "
         SELECT DISTINCT u.user_id, u.user_name, u.user_email
         FROM users u
@@ -33,21 +46,22 @@ function sendUpdateNotifications($update_id) {
     ";
     $donors = $db->db_fetch_all($donors_query, [$update['school_id']]);
     
+    // No donors? Nothing to do here
     if (empty($donors)) {
-        return true; // No donors to notify
+        return true;
     }
     
-    // Prepare email content
+    // Set up the email content
     $subject = "New Update from " . $update['school_name'];
     $update_url = "https://yourdomain.com/school_updates.php?id=" . $update['school_id'];
     
     $sent_count = 0;
     
+    // Send personalized emails to each donor
     foreach ($donors as $donor) {
         $message = getEmailTemplate($donor, $update, $update_url);
         
-        // Send email using PHP mail() function
-        // In production, use a proper email service like SendGrid, Mailgun, or AWS SES
+        // Set up email headers for HTML content
         $headers = "MIME-Version: 1.0\r\n";
         $headers .= "Content-type: text/html; charset=UTF-8\r\n";
         $headers .= "From: GiveToGrow <noreply@givetogrow.org>\r\n";
@@ -60,12 +74,25 @@ function sendUpdateNotifications($update_id) {
     return $sent_count;
 }
 
+/**
+ * Generate a nice HTML email template for update notifications
+ * 
+ * Creates a branded, mobile-friendly email that looks professional
+ * and encourages donors to check out the full update.
+ * 
+ * @param array $donor The donor's info (user_name, user_email)
+ * @param array $update The update details from the database
+ * @param string $update_url Link to view the full update
+ * @return string The complete HTML email content
+ */
 function getEmailTemplate($donor, $update, $update_url) {
+    // Escape everything to prevent XSS in emails
     $donor_name = htmlspecialchars($donor['user_name']);
     $school_name = htmlspecialchars($update['school_name']);
     $update_title = htmlspecialchars($update['update_title']);
     $update_description = htmlspecialchars(substr($update['update_description'], 0, 200));
     
+    // Human-readable labels for update types
     $update_type_text = [
         'general' => 'General Update',
         'milestone' => 'Milestone Achieved!',

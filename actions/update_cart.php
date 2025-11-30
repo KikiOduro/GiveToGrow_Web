@@ -1,8 +1,21 @@
 <?php
+/**
+ * Cart Update Handler
+ * 
+ * Handles AJAX requests to modify cart items - either updating the quantity
+ * or removing items entirely. Used by the cart page's +/- buttons and
+ * the remove button.
+ * 
+ * Expected POST data:
+ * - action: 'update_quantity' or 'remove'
+ * - cart_id: Which cart item to modify
+ * - change: (for update_quantity) How much to add/subtract (e.g., +1 or -1)
+ */
+
 session_start();
 header('Content-Type: application/json');
 
-// Check if user is logged in
+// Must be logged in to modify cart
 if (!isset($_SESSION['user_id'])) {
     echo json_encode(['success' => false, 'message' => 'Please login first']);
     exit();
@@ -13,7 +26,7 @@ require_once __DIR__ . '/../settings/db_class.php';
 $db = new db_connection();
 $user_id = $_SESSION['user_id'];
 
-// Get action type
+// What are we doing? Update quantity or remove?
 $action = isset($_POST['action']) ? $_POST['action'] : '';
 $cart_id = isset($_POST['cart_id']) ? intval($_POST['cart_id']) : 0;
 
@@ -22,7 +35,8 @@ if ($cart_id <= 0) {
     exit();
 }
 
-// Verify that this cart item belongs to the logged-in user
+// Security check: Make sure this cart item actually belongs to this user
+// Prevents users from modifying other people's carts!
 $verify_query = "SELECT * FROM cart WHERE cart_id = ? AND user_id = ?";
 $cart_item = $db->db_fetch_one($verify_query, [$cart_id, $user_id]);
 

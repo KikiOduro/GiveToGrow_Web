@@ -1,8 +1,19 @@
 <?php
+/**
+ * Process Payment Handler
+ * 
+ * This handles the direct payment processing flow (non-Paystack).
+ * It creates donation records for each cart item, updates school funding
+ * totals, and clears the user's cart after a successful payment.
+ * 
+ * Note: This is a simplified payment flow. In production, you'd want to
+ * integrate with a real payment gateway before creating donation records.
+ */
+
 session_start();
 header('Content-Type: application/json');
 
-// Check if user is logged in
+// User must be logged in to make a payment
 if (!isset($_SESSION['user_id'])) {
     echo json_encode(['success' => false, 'message' => 'Please login first']);
     exit();
@@ -13,7 +24,7 @@ require_once __DIR__ . '/../settings/db_class.php';
 $db = new db_connection();
 $user_id = $_SESSION['user_id'];
 
-// Get form data
+// Collect the billing/contact information from the form
 $full_name = isset($_POST['full_name']) ? trim($_POST['full_name']) : '';
 $email = isset($_POST['email']) ? trim($_POST['email']) : '';
 $payment_method = isset($_POST['payment_method']) ? $_POST['payment_method'] : 'mobile_money';

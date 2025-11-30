@@ -1,7 +1,17 @@
 <?php
+/**
+ * Checkout Page
+ * 
+ * The final step before payment - shows order summary and collects
+ * payment details. Users can choose between card payment (via Paystack)
+ * or mobile money.
+ * 
+ * If the cart is empty, we redirect them back to the cart page.
+ */
+
 session_start();
 
-// Check if user is logged in
+// Must be logged in to checkout - redirect guests to login
 if (!isset($_SESSION['user_id'])) {
     header("Location: ../login/login.php");
     exit();
@@ -11,7 +21,7 @@ require_once __DIR__ . '/../settings/db_class.php';
 
 $db = new db_connection();
 
-// Get user information
+// Get user info from session
 $user_id = $_SESSION['user_id'];
 $user_name = isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : '';
 $user_email = isset($_SESSION['user_email']) ? htmlspecialchars($_SESSION['user_email']) : '';
