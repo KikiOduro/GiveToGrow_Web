@@ -366,8 +366,8 @@ if ($result) {
                             <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
                                 <?php echo htmlspecialchars(substr($update['update_description'], 0, 120)); ?>...
                             </p>
-                            <a href="school_updates.php?school_id=<?php echo $update['school_id']; ?>" class="inline-flex items-center gap-1 text-primary text-sm font-medium mt-3 hover:underline">
-                                Read More <span class="material-symbols-outlined" style="font-size: 16px;">arrow_forward</span>
+                            <a href="school_detail.php?id=<?php echo $update['school_id']; ?>" class="inline-flex items-center gap-1 text-primary text-sm font-medium mt-3 hover:underline">
+                                View School <span class="material-symbols-outlined" style="font-size: 16px;">arrow_forward</span>
                             </a>
                         </div>
                     </div>

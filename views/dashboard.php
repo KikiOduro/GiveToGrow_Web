@@ -311,7 +311,7 @@ try {
             ];
             $type_info = $update_types[$update['update_type']] ?? $update_types['general'];
         ?>
-        <a href="school_updates.php?school_id=<?php echo $update['school_id']; ?>" 
+        <a href="school_detail.php?id=<?php echo $update['school_id']; ?>" 
            class="flex flex-col bg-white dark:bg-neutral-800 rounded-lg overflow-hidden border border-neutral-200 dark:border-neutral-700 hover:shadow-lg transition-shadow">
             <?php if ($update['image_url']): ?>
             <div class="h-40 bg-cover bg-center" style="background-image: url('<?php echo htmlspecialchars($update['image_url']); ?>');"></div>
