@@ -259,7 +259,7 @@ $schools = $db->db_fetch_all("SELECT school_id, school_name, location FROM schoo
                         </label>
                         
                         <!-- Hidden input to store the image URL -->
-                        <input type="hidden" id="image_url" name="image_url" required/>
+                        <input type="hidden" id="image_url" name="image_url" value=""/>
                         
                         <!-- Upload Button -->
                         <div id="upload-container" class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-primary transition-colors cursor-pointer" onclick="openUploadWidget()">
@@ -279,6 +279,19 @@ $schools = $db->db_fetch_all("SELECT school_id, school_name, location FROM schoo
                                 </button>
                             </div>
                         </div>
+                        
+                        <!-- Alternative: Direct URL input -->
+                        <div class="mt-3">
+                            <label class="flex items-center gap-2 text-sm text-gray-500 cursor-pointer">
+                                <input type="checkbox" id="use-url-input" onchange="toggleUrlInput()" class="rounded border-gray-300"/>
+                                Or enter image URL directly
+                            </label>
+                            <input type="url" id="direct-url-input" 
+                                   class="hidden mt-2 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-sm"
+                                   placeholder="https://example.com/image.jpg"
+                                   onchange="setDirectUrl(this.value)"/>
+                        </div>
+                        
                         <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Images are securely stored on Cloudinary</p>
                     </div>
                 </div>
@@ -341,10 +354,23 @@ function openUploadWidget() {
             }
         }
     }, (error, result) => {
-        if (!error && result && result.event === "success") {
+        if (error) {
+            console.error('Cloudinary error:', error);
+            Swal.fire({
+                title: 'Upload Error',
+                text: 'Failed to upload image. Try using the direct URL option instead.',
+                icon: 'error',
+                confirmButtonColor: '#A4B8A4'
+            });
+            return;
+        }
+        
+        if (result && result.event === "success") {
             // Get the secure URL
             const imageUrl = result.info.secure_url;
             const fileName = result.info.original_filename + '.' + result.info.format;
+            
+            console.log('Image uploaded:', imageUrl); // Debug log
             
             // Update the hidden input
             document.getElementById('image_url').value = imageUrl;
@@ -358,6 +384,10 @@ function openUploadWidget() {
             // Update container style
             document.getElementById('upload-container').classList.remove('border-dashed');
             document.getElementById('upload-container').classList.add('border-solid', 'border-primary');
+            
+            // Hide direct URL input if it was shown
+            document.getElementById('use-url-input').checked = false;
+            document.getElementById('direct-url-input').classList.add('hidden');
             
             Swal.fire({
                 title: 'Image Uploaded!',
@@ -383,16 +413,51 @@ function removeImage() {
     // Reset container style
     document.getElementById('upload-container').classList.add('border-dashed');
     document.getElementById('upload-container').classList.remove('border-solid', 'border-primary');
+    
+    // Clear direct URL input too
+    document.getElementById('direct-url-input').value = '';
+}
+
+// Toggle direct URL input visibility
+function toggleUrlInput() {
+    const checkbox = document.getElementById('use-url-input');
+    const urlInput = document.getElementById('direct-url-input');
+    
+    if (checkbox.checked) {
+        urlInput.classList.remove('hidden');
+        urlInput.focus();
+    } else {
+        urlInput.classList.add('hidden');
+    }
+}
+
+// Set image URL from direct input
+function setDirectUrl(url) {
+    if (url && url.trim()) {
+        document.getElementById('image_url').value = url.trim();
+        
+        // Show preview
+        document.getElementById('upload-placeholder').classList.add('hidden');
+        document.getElementById('image-preview').classList.remove('hidden');
+        document.getElementById('preview-img').src = url.trim();
+        document.getElementById('preview-name').textContent = 'Direct URL';
+        
+        // Update container style
+        document.getElementById('upload-container').classList.remove('border-dashed');
+        document.getElementById('upload-container').classList.add('border-solid', 'border-primary');
+    }
 }
 
 // Form validation
 document.querySelector('form').addEventListener('submit', function(e) {
     const imageUrl = document.getElementById('image_url').value;
-    if (!imageUrl) {
+    console.log('Submitting with image URL:', imageUrl); // Debug log
+    
+    if (!imageUrl || imageUrl.trim() === '') {
         e.preventDefault();
         Swal.fire({
             title: 'Image Required',
-            text: 'Please upload an image for the school need.',
+            text: 'Please upload an image or enter an image URL for the school need.',
             icon: 'warning',
             confirmButtonColor: '#A4B8A4'
         });
