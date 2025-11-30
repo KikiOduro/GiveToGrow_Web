@@ -91,8 +91,14 @@ $history_query = "
     LIMIT 20
 ";
 $donation_history = $db->db_fetch_all($history_query, [$user_id]);
+if (!$donation_history) {
+    $donation_history = [];
+}
 
 // Fetch recent updates from schools the user has donated to
+// Note: This requires the school_updates table to exist
+$recent_updates = [];
+/*
 $updates_query = "
     SELECT su.*, s.school_name, s.image_url as school_image
     FROM school_updates su
@@ -107,6 +113,7 @@ $updates_query = "
     LIMIT 5
 ";
 $recent_updates = $db->db_fetch_all($updates_query, [$user_id]);
+*/
 ?>
 <!DOCTYPE html>
 <html class="light" lang="en">
