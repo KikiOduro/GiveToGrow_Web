@@ -35,8 +35,7 @@ if ($cart_items) {
     }
 }
 
-$processing_fee = $subtotal > 0 ? 5.00 : 0; // Fixed $5 processing fee
-$total = $subtotal + $processing_fee;
+$total = $subtotal;
 ?>
 <!DOCTYPE html>
 <html class="light" lang="en">
@@ -198,15 +197,6 @@ $total = $subtotal + $processing_fee;
             <h3 class="text-[#333333] dark:text-neutral-100 text-lg font-bold px-0 md:px-4 pb-2 pt-4">Donation Summary</h3>
             <div class="px-0 md:px-4">
                 <div class="rounded-xl bg-white dark:bg-neutral-800 p-6 shadow-[0_2px_8px_rgba(0,0,0,0.05)] space-y-4">
-                    <div class="flex justify-between items-center text-neutral-600 dark:text-neutral-300">
-                        <span>Subtotal</span>
-                        <span>₵<?php echo number_format($subtotal, 2); ?></span>
-                    </div>
-                    <div class="flex justify-between items-center text-neutral-600 dark:text-neutral-300">
-                        <span>Processing Fee</span>
-                        <span>₵<?php echo number_format($processing_fee, 2); ?></span>
-                    </div>
-                    <div class="border-t border-dashed border-[#e0e0e0] dark:border-neutral-700 my-4"></div>
                     <div class="flex justify-between items-center text-xl font-bold text-[#333333] dark:text-neutral-100">
                         <span>Total Donation Amount</span>
                         <span>₵<?php echo number_format($total, 2); ?></span>

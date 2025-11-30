@@ -19,18 +19,36 @@ require_once __DIR__ . '/../settings/db_class.php';
 $db = new db_connection();
 $user_id = $_SESSION['user_id'];
 
-// Fetch donation details
-$donation_query = "SELECT d.*, s.school_name, s.country, sn.item_name 
-                   FROM donations d
-                   JOIN schools s ON d.school_id = s.school_id
-                   JOIN school_needs sn ON d.need_id = sn.need_id
-                   WHERE d.donation_id = ? AND d.user_id = ?";
-$donation = $db->db_fetch_one($donation_query, [$donation_id, $user_id]);
+// First, get the transaction_date from the primary donation
+$primary_donation_query = "SELECT transaction_date, donor_email FROM donations WHERE donation_id = ? AND user_id = ?";
+$primary_donation = $db->db_fetch_one($primary_donation_query, [$donation_id, $user_id]);
 
-if (!$donation) {
+if (!$primary_donation) {
     header("Location: dashboard.php");
     exit();
 }
+
+// Fetch ALL donations from the same transaction (same user, same transaction_date)
+$all_donations_query = "SELECT d.*, s.school_name, s.country, sn.item_name 
+                        FROM donations d
+                        JOIN schools s ON d.school_id = s.school_id
+                        JOIN school_needs sn ON d.need_id = sn.need_id
+                        WHERE d.user_id = ? AND d.transaction_date = ?
+                        ORDER BY d.donation_id ASC";
+$donations = $db->db_fetch_all($all_donations_query, [$user_id, $primary_donation['transaction_date']]);
+
+// Calculate total amount
+$total_amount = 0;
+$schools_list = [];
+foreach ($donations as $d) {
+    $total_amount += $d['amount'];
+    if (!in_array($d['school_name'], $schools_list)) {
+        $schools_list[] = $d['school_name'];
+    }
+}
+
+$donor_email = $primary_donation['donor_email'];
+$schools_text = count($schools_list) > 1 ? implode(', ', array_slice($schools_list, 0, -1)) . ' and ' . end($schools_list) : $schools_list[0];
 ?>
 <!DOCTYPE html>
 <html class="light" lang="en">
@@ -101,36 +119,44 @@ if (!$donation) {
                 Thank You for Your Donation!
             </h1>
             <p class="text-neutral-600 dark:text-neutral-400">
-                Your generous contribution will make a real difference at <?php echo htmlspecialchars($donation['school_name']); ?>.
+                Your generous contribution will make a real difference at <?php echo htmlspecialchars($schools_text); ?>.
             </p>
         </div>
         
         <!-- Donation Details Card -->
         <div class="bg-white dark:bg-neutral-900 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-800 p-6 mb-6">
             <div class="space-y-4">
+                <!-- Transaction ID -->
                 <div class="flex justify-between items-center pb-4 border-b border-neutral-200 dark:border-neutral-800">
-                    <span class="text-sm text-neutral-600 dark:text-neutral-400">Donation ID</span>
+                    <span class="text-sm text-neutral-600 dark:text-neutral-400">Transaction ID</span>
                     <span class="font-bold text-[#131514] dark:text-white">#<?php echo str_pad($donation_id, 6, '0', STR_PAD_LEFT); ?></span>
                 </div>
                 
-                <div class="flex justify-between items-center">
-                    <span class="text-sm text-neutral-600 dark:text-neutral-400">Item</span>
-                    <span class="font-semibold text-[#131514] dark:text-white"><?php echo htmlspecialchars($donation['item_name']); ?></span>
+                <!-- Items List -->
+                <div class="space-y-3">
+                    <span class="text-sm font-medium text-neutral-600 dark:text-neutral-400">Items Donated</span>
+                    <?php foreach ($donations as $donation): ?>
+                    <div class="flex justify-between items-start py-2 <?php echo $donation !== end($donations) ? 'border-b border-neutral-100 dark:border-neutral-800' : ''; ?>">
+                        <div class="flex-1">
+                            <p class="font-semibold text-[#131514] dark:text-white text-sm">
+                                <?php echo htmlspecialchars($donation['item_name']); ?> 
+                                <span class="text-neutral-500">×<?php echo $donation['quantity']; ?></span>
+                            </p>
+                            <p class="text-xs text-neutral-500 dark:text-neutral-400">
+                                <?php echo htmlspecialchars($donation['school_name']); ?>
+                            </p>
+                        </div>
+                        <span class="font-semibold text-[#131514] dark:text-white text-sm">
+                            ₵<?php echo number_format($donation['amount'], 2); ?>
+                        </span>
+                    </div>
+                    <?php endforeach; ?>
                 </div>
                 
-                <div class="flex justify-between items-center">
-                    <span class="text-sm text-neutral-600 dark:text-neutral-400">School</span>
-                    <span class="font-semibold text-[#131514] dark:text-white"><?php echo htmlspecialchars($donation['school_name']); ?></span>
-                </div>
-                
-                <div class="flex justify-between items-center">
-                    <span class="text-sm text-neutral-600 dark:text-neutral-400">Quantity</span>
-                    <span class="font-semibold text-[#131514] dark:text-white">×<?php echo $donation['quantity']; ?></span>
-                </div>
-                
+                <!-- Total -->
                 <div class="flex justify-between items-center pt-4 border-t border-neutral-200 dark:border-neutral-800">
                     <span class="text-base font-bold text-[#131514] dark:text-white">Total Amount</span>
-                    <span class="text-2xl font-black text-primary">₵<?php echo number_format($donation['amount'], 2); ?></span>
+                    <span class="text-2xl font-black text-primary">₵<?php echo number_format($total_amount, 2); ?></span>
                 </div>
             </div>
         </div>
@@ -151,7 +177,7 @@ if (!$donation) {
         <div class="mt-8 text-center">
             <p class="text-sm text-neutral-500 dark:text-neutral-400">
                 <span class="material-symbols-outlined text-base align-middle">mail</span>
-                A confirmation email has been sent to <strong><?php echo htmlspecialchars($donation['donor_email']); ?></strong>
+                A confirmation email has been sent to <strong><?php echo htmlspecialchars($donor_email); ?></strong>
             </p>
         </div>
     </div>
