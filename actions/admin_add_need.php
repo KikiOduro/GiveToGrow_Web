@@ -27,12 +27,19 @@ $item_description = trim($_POST['item_description'] ?? '');
 $item_category = $_POST['item_category'] ?? '';
 $unit_price = floatval($_POST['unit_price'] ?? 0);
 $quantity_needed = intval($_POST['quantity_needed'] ?? 0);
-$image_url = trim($_POST['image_url'] ?? '');
 $priority = $_POST['priority'] ?? 'medium';
 
+// Handle image_url - get it directly from POST
+$image_url = '';
+if (isset($_POST['image_url']) && !empty($_POST['image_url'])) {
+    $image_url = trim($_POST['image_url']);
+}
+
 // Debug: Log what we received
-error_log("ADD NEED - Received image_url: " . $image_url);
+error_log("ADD NEED - Received image_url: '" . $image_url . "'");
 error_log("ADD NEED - POST data: " . print_r($_POST, true));
+error_log("ADD NEED - Raw POST image_url isset: " . (isset($_POST['image_url']) ? 'yes' : 'no'));
+error_log("ADD NEED - Raw POST image_url value: " . (isset($_POST['image_url']) ? $_POST['image_url'] : 'NOT SET'));
 
 // Validate required fields
 if ($school_id <= 0 || empty($item_name) || empty($item_category) || $unit_price <= 0 || $quantity_needed <= 0 || empty($image_url)) {
@@ -60,7 +67,7 @@ try {
         throw new Exception("Failed to prepare statement: " . $conn->error);
     }
     
-    $stmt->bind_param('isssdiis', 
+    $stmt->bind_param('isssdiss', 
         $school_id,
         $item_name,
         $item_description,

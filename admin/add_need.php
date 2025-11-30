@@ -249,18 +249,19 @@ $schools = $db->db_fetch_all("SELECT school_id, school_name, location FROM schoo
                     
                     <!-- Image URL Input -->
                     <div>
-                        <label for="image_url" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <label for="image_url_input" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             Item Image URL <span class="text-red-500">*</span>
                         </label>
                         <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">
                             Find an image online, right-click it, and select "Copy Image Address" to get the URL
                         </p>
                         <div class="flex gap-2">
-                            <input type="url" id="image_url" name="image_url" required
+                            <input type="text" id="image_url_input" name="image_url" required
                                    class="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-[#131514] dark:text-background-light focus:ring-2 focus:ring-primary focus:border-transparent"
                                    placeholder="https://example.com/image.jpg"
-                                   oninput="previewImage(this.value)"/>
-                            <button type="button" onclick="previewImage(document.getElementById('image_url').value)" 
+                                   onchange="previewImage(this.value)"
+                                   onpaste="setTimeout(function(){ previewImage(document.getElementById('image_url_input').value); }, 100)"/>
+                            <button type="button" onclick="previewImage(document.getElementById('image_url_input').value)" 
                                     class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-300 dark:hover:bg-gray-600">
                                 Preview
                             </button>
@@ -301,7 +302,7 @@ function previewImage(url) {
     const previewContainer = document.getElementById('image-preview-container');
     const previewImg = document.getElementById('preview-img');
     
-    if (url && url.startsWith('http')) {
+    if (url && url.trim().startsWith('http')) {
         // Set up error handler before setting src
         previewImg.onerror = function() {
             previewContainer.classList.add('hidden');
@@ -315,15 +316,18 @@ function previewImage(url) {
         previewImg.onload = function() {
             previewContainer.classList.remove('hidden');
         };
-        previewImg.src = url;
+        previewImg.src = url.trim();
     } else {
         previewContainer.classList.add('hidden');
     }
 }
 
-// Form validation
+// Form validation before submit
 document.getElementById('addNeedForm').addEventListener('submit', function(e) {
-    const imageUrl = document.getElementById('image_url').value.trim();
+    const imageUrlInput = document.getElementById('image_url_input');
+    const imageUrl = imageUrlInput.value.trim();
+    
+    console.log('Form submitting with image_url:', imageUrl);
     
     if (!imageUrl || !imageUrl.startsWith('http')) {
         e.preventDefault();
@@ -335,6 +339,11 @@ document.getElementById('addNeedForm').addEventListener('submit', function(e) {
         });
         return false;
     }
+    
+    // Make sure the value is trimmed before submitting
+    imageUrlInput.value = imageUrl;
+    
+    console.log('Submitting form with image_url value:', imageUrlInput.value);
 });
 </script>
 
