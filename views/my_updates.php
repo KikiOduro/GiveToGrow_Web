@@ -134,7 +134,8 @@ try {
             foreach ($updates as $update): 
                 $type_info = $update_types[$update['update_type']] ?? $update_types['general'];
             ?>
-            <div class="bg-white dark:bg-neutral-800 rounded-lg overflow-hidden border border-gray-200 dark:border-neutral-700 hover:shadow-lg transition-shadow">
+            <a href="school_updates.php?school_id=<?php echo $update['school_id']; ?>" 
+               class="block bg-white dark:bg-neutral-800 rounded-lg overflow-hidden border border-gray-200 dark:border-neutral-700 hover:shadow-lg transition-shadow cursor-pointer">
                 <?php if ($update['image_url']): ?>
                 <div class="h-64 bg-cover bg-center" style="background-image: url('<?php echo htmlspecialchars($update['image_url']); ?>');"></div>
                 <?php endif; ?>
@@ -161,16 +162,15 @@ try {
                     </p>
                     
                     <p class="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
-                        <?php echo nl2br(htmlspecialchars($update['update_description'])); ?>
+                        <?php echo nl2br(htmlspecialchars(substr($update['update_description'], 0, 150))); ?><?php echo strlen($update['update_description']) > 150 ? '...' : ''; ?>
                     </p>
                     
-                    <a href="school_updates.php?school_id=<?php echo $update['school_id']; ?>#update-<?php echo $update['update_id']; ?>" 
-                       class="inline-flex items-center gap-2 text-primary font-medium hover:underline">
+                    <span class="inline-flex items-center gap-2 text-primary font-medium">
                         View Full Impact Report
                         <span class="material-symbols-outlined" style="font-size: 18px;">arrow_forward</span>
-                    </a>
+                    </span>
                 </div>
-            </div>
+            </a>
             <?php endforeach; ?>
         </div>
         <?php endif; ?>
