@@ -8,8 +8,11 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
 $login_error = $_SESSION['login_error'] ?? '';
 $old_email   = $_SESSION['old_email'] ?? '';
 
+// Get redirect URL from query param or session
+$redirect = $_GET['redirect'] ?? ($_SESSION['redirect_after_login'] ?? '');
+
 // Clear them so they don't persist forever
-unset($_SESSION['login_error'], $_SESSION['old_email']);
+unset($_SESSION['login_error'], $_SESSION['old_email'], $_SESSION['redirect_after_login']);
 
 // Simple escape helper
 function e($value)
@@ -158,6 +161,9 @@ function e($value)
         <?php endif; ?>
 
         <form class="mt-8 space-y-6" method="POST" action="../actions/login_customer.php">
+          <!-- Hidden redirect field -->
+          <input type="hidden" name="redirect" value="<?php echo e($redirect); ?>" />
+          
           <!-- Email Field -->
           <div class="flex flex-col">
             <label
@@ -222,7 +228,7 @@ function e($value)
           <p class="text-sm text-gray-600 dark:text-gray-400">
             Don't have an account?
             <a
-              href="../login/register.php"
+              href="../login/register.php<?php echo !empty($redirect) ? '?redirect=' . urlencode($redirect) : ''; ?>"
               class="font-medium text-primary hover:underline">Sign Up</a>
           </p>
         </div>

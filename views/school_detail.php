@@ -1,11 +1,9 @@
 <?php
 session_start();
 
-// Check if user is logged in
-if (!isset($_SESSION['user_id'])) {
-    header("Location: ../login/login.php");
-    exit();
-}
+// Guest browsing allowed - no login required to view school details
+// Check if user is logged in (for cart and donation features)
+$is_logged_in = isset($_SESSION['user_id']);
 
 // Get school ID from URL
 $school_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
@@ -37,27 +35,29 @@ $needs_query = "SELECT * FROM school_needs WHERE school_id = ? AND status = 'act
 $needs = $db->db_fetch_all($needs_query, [$school_id]);
 
 // Get user information
-$user_name = isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : 'User';
+$user_name = $is_logged_in ? htmlspecialchars($_SESSION['user_name']) : 'Guest';
 
-// Get cart count for this user
+// Get cart count for this user (only if logged in)
 $cart_count = 0;
 $cart_total = 0;
 
 // Try to get cart data, handle gracefully if table doesn't exist or is empty
-try {
-    $cart_query = "SELECT COUNT(*) as total_items, 
-                          COALESCE(SUM(cart.quantity * school_needs.unit_price), 0) as total_amount 
-                   FROM cart 
-                   LEFT JOIN school_needs ON cart.need_id = school_needs.need_id 
-                   WHERE cart.user_id = ?";
-    $cart_data = $db->db_fetch_one($cart_query, [$_SESSION['user_id']]);
-    if ($cart_data) {
-        $cart_count = $cart_data['total_items'] ?? 0;
-        $cart_total = $cart_data['total_amount'] ?? 0;
+if ($is_logged_in) {
+    try {
+        $cart_query = "SELECT COUNT(*) as total_items, 
+                              COALESCE(SUM(cart.quantity * school_needs.unit_price), 0) as total_amount 
+                       FROM cart 
+                       LEFT JOIN school_needs ON cart.need_id = school_needs.need_id 
+                       WHERE cart.user_id = ?";
+        $cart_data = $db->db_fetch_one($cart_query, [$_SESSION['user_id']]);
+        if ($cart_data) {
+            $cart_count = $cart_data['total_items'] ?? 0;
+            $cart_total = $cart_data['total_amount'] ?? 0;
+        }
+    } catch (Exception $e) {
+        // Cart table doesn't exist yet or query failed, use defaults
+        error_log("Cart query error: " . $e->getMessage());
     }
-} catch (Exception $e) {
-    // Cart table doesn't exist yet or query failed, use defaults
-    error_log("Cart query error: " . $e->getMessage());
 }
 ?>
 <!DOCTYPE html>
@@ -107,8 +107,32 @@ try {
         // // Initialize theme on page load
         // initTheme();
 
+        // Check if user is logged in (passed from PHP)
+        const isLoggedIn = <?php echo $is_logged_in ? 'true' : 'false'; ?>;
+
         // Add to cart function
         function addToCart(needId) {
+            // Redirect to login if not logged in
+            if (!isLoggedIn) {
+                Swal.fire({
+                    title: 'Login Required',
+                    text: 'Please log in or create an account to add items to your cart.',
+                    icon: 'info',
+                    showCancelButton: true,
+                    confirmButtonText: 'Log In',
+                    cancelButtonText: 'Sign Up',
+                    confirmButtonColor: '#A4B8A4',
+                    cancelButtonColor: '#6b7280'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '../login/login.php?redirect=' + encodeURIComponent(window.location.href);
+                    } else if (result.dismiss === Swal.DismissReason.cancel) {
+                        window.location.href = '../login/register.php?redirect=' + encodeURIComponent(window.location.href);
+                    }
+                });
+                return;
+            }
+
             fetch('../actions/add_to_cart.php', {
                 method: 'POST',
                 headers: {
@@ -161,10 +185,57 @@ try {
 
         // Quick donate function
         function quickDonate(needId) {
+            // Redirect to login if not logged in
+            if (!isLoggedIn) {
+                Swal.fire({
+                    title: 'Login Required',
+                    text: 'Please log in or create an account to make a donation.',
+                    icon: 'info',
+                    showCancelButton: true,
+                    confirmButtonText: 'Log In',
+                    cancelButtonText: 'Sign Up',
+                    confirmButtonColor: '#A4B8A4',
+                    cancelButtonColor: '#6b7280'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '../login/login.php?redirect=' + encodeURIComponent(window.location.href);
+                    } else if (result.dismiss === Swal.DismissReason.cancel) {
+                        window.location.href = '../login/register.php?redirect=' + encodeURIComponent(window.location.href);
+                    }
+                });
+                return;
+            }
+
             addToCart(needId);
             setTimeout(() => {
                 window.location.href = 'cart.php';
             }, 500);
+        }
+
+        // Donate now button click handler
+        function donateNow(needId) {
+            // Redirect to login if not logged in
+            if (!isLoggedIn) {
+                Swal.fire({
+                    title: 'Login Required',
+                    text: 'Please log in or create an account to make a donation.',
+                    icon: 'info',
+                    showCancelButton: true,
+                    confirmButtonText: 'Log In',
+                    cancelButtonText: 'Sign Up',
+                    confirmButtonColor: '#A4B8A4',
+                    cancelButtonColor: '#6b7280'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '../login/login.php?redirect=' + encodeURIComponent(window.location.href);
+                    } else if (result.dismiss === Swal.DismissReason.cancel) {
+                        window.location.href = '../login/register.php?redirect=' + encodeURIComponent(window.location.href);
+                    }
+                });
+                return;
+            }
+            
+            window.location.href = 'donate_item.php?id=' + needId;
         }
     </script>
     <style>
@@ -289,10 +360,10 @@ try {
                     <?php endif; ?>
                     <?php if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin'): ?>
                     <div class="flex items-center gap-2 mt-3">
-                        <a href="donate_item.php?id=<?php echo $need['need_id']; ?>" 
+                        <button onclick="donateNow(<?php echo $need['need_id']; ?>)" 
                            class="flex-grow px-4 py-2 text-sm font-bold text-white bg-primary rounded-full hover:bg-primary/90 transition-colors text-center">
                             Donate Now
-                        </a>
+                        </button>
                         <button onclick="addToCart(<?php echo $need['need_id']; ?>)" 
                                 class="p-2 text-primary dark:text-primary bg-primary/10 dark:bg-primary/20 rounded-full hover:bg-primary/20 dark:hover:bg-primary/30 transition-colors">
                             <span class="material-symbols-outlined">add_shopping_cart</span>

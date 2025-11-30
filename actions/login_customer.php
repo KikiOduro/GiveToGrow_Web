@@ -28,11 +28,13 @@ require_once __DIR__ . '/../controllers/customer_controller.php';
 // Grab the form data - using null coalescing operator to avoid undefined index warnings
 $email    = $_POST['email']    ?? '';
 $password = $_POST['password'] ?? '';
+$redirect = $_POST['redirect'] ?? '';
 
 // First things first - make sure they actually entered something
 if (trim($email) === '' || trim($password) === '') {
     $_SESSION['login_error'] = 'Email and password are required.';
-    header('Location: ../login/login.php');
+    $_SESSION['redirect_after_login'] = $redirect;
+    header('Location: ../login/login.php' . ($redirect ? '?redirect=' . urlencode($redirect) : ''));
     exit;
 }
 
@@ -49,7 +51,23 @@ if ($result && password_verify($password, $result['password_hash'])) {
     $_SESSION['user_role']  = $result['user_role'] ?? 'customer'; // Default to customer if role not set
     $_SESSION['logged_in']  = true;
 
-    // Send users to their dashboard
+    // Clear any stored redirect
+    unset($_SESSION['redirect_after_login']);
+    
+    // Redirect to intended destination if specified, otherwise to dashboard
+    if (!empty($redirect) && strpos($redirect, 'http') === 0) {
+        // Validate the redirect URL to prevent open redirect vulnerabilities
+        $parsed_url = parse_url($redirect);
+        $host = $parsed_url['host'] ?? '';
+        
+        // Only allow redirects to same domain or localhost
+        if ($host === 'localhost' || $host === '127.0.0.1' || strpos($host, '169.239.251.102') !== false) {
+            header('Location: ' . $redirect);
+            exit;
+        }
+    }
+    
+    // Default: send users to their dashboard
     header('Location: ../views/dashboard.php');
     exit;
 }

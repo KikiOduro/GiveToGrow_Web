@@ -142,10 +142,10 @@ function getPriorityBadge($school_id, $db) {
 <h2 class="text-xl font-bold">GiveToGrow</h2>
 </div>
 <div class="hidden md:flex items-center gap-8">
-<a class="text-sm font-medium hover:text-primary" href="#">How it works</a>
-<a class="text-sm font-medium hover:text-primary" href="#">Schools</a>
-<a class="text-sm font-medium hover:text-primary" href="#">About</a>
-<a class="text-sm font-medium hover:text-primary" href="#">Contact</a>
+<a class="text-sm font-medium hover:text-primary" href="dashboard.php#how-it-works">How it works</a>
+<a class="text-sm font-medium hover:text-primary" href="schools.php">Schools</a>
+<a class="text-sm font-medium hover:text-primary" href="about.php">About</a>
+<a class="text-sm font-medium hover:text-primary" href="dashboard.php#contact">Contact</a>
 </div>
 <div class="hidden md:flex items-center gap-2">
 <a href="../login/login.php" class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-background-light dark:bg-card-dark text-sm font-bold border border-border-light dark:border-border-dark hover:bg-gray-100 dark:hover:bg-gray-700">
@@ -169,10 +169,10 @@ function getPriorityBadge($school_id, $db) {
 <p class="text-base lg:text-lg text-gray-600 dark:text-gray-400">Connect with under-resourced schools in Ghana and provide the tools they need to succeed. Your contribution makes a direct impact.</p>
 </div>
 <div class="flex flex-wrap gap-4 justify-center lg:justify-start">
-<a href="../login/login.php" class="flex min-w-[120px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-6 bg-primary text-white text-base font-bold hover:opacity-90">
+<a href="schools.php" class="flex min-w-[120px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-6 bg-primary text-white text-base font-bold hover:opacity-90">
 <span class="truncate">Donate Now</span>
 </a>
-<a href="../login/login.php" class="flex min-w-[120px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-6 bg-transparent text-sm font-bold border border-border-light dark:border-border-dark hover:bg-gray-100 dark:hover:bg-gray-800">
+<a href="dashboard.php#how-it-works" class="flex min-w-[120px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-6 bg-transparent text-sm font-bold border border-border-light dark:border-border-dark hover:bg-gray-100 dark:hover:bg-gray-800">
 <span class="truncate">See how it works</span>
 </a>
 </div>
@@ -276,10 +276,10 @@ if (!empty($featured_schools)) {
             </div>
         </div>
         <div class="flex items-center gap-2 mt-auto">
-            <a href="../login/login.php" class="w-full flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-primary text-white text-sm font-bold hover:opacity-90">
+            <a href="school_detail.php?id=<?php echo $school['school_id']; ?>" class="w-full flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-primary text-white text-sm font-bold hover:opacity-90">
                 <span>View School</span>
             </a>
-            <a href="../login/login.php" class="flex-shrink-0 flex cursor-pointer items-center justify-center rounded-full h-10 w-10 bg-primary/20 text-primary hover:bg-primary/30">
+            <a href="school_detail.php?id=<?php echo $school['school_id']; ?>" class="flex-shrink-0 flex cursor-pointer items-center justify-center rounded-full h-10 w-10 bg-primary/20 text-primary hover:bg-primary/30">
                 <span class="material-symbols-outlined">add_shopping_cart</span>
             </a>
         </div>
@@ -319,10 +319,10 @@ if (!empty($featured_schools)) {
 <h2 class="text-3xl lg:text-4xl font-bold tracking-tight">Ready to help a classroom grow?</h2>
 <p class="mt-4 text-lg text-gray-600 dark:text-gray-400">Your contribution, big or small, creates a world of opportunity. Join us in empowering the next generation of leaders.</p>
 <div class="mt-8 flex justify-center gap-4">
-<a href="../login/login.php" class="flex min-w-[120px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-6 bg-primary text-white text-base font-bold hover:opacity-90">
+<a href="schools.php" class="flex min-w-[120px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-6 bg-primary text-white text-base font-bold hover:opacity-90">
 <span class="truncate">Donate Now</span>
 </a>
-<a href="../login/login.php" class="flex min-w-[120px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-6 bg-transparent border border-border-light dark:border-border-dark text-sm font-bold hover:bg-gray-100 dark:hover:bg-gray-800">
+<a href="schools.php" class="flex min-w-[120px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-6 bg-transparent border border-border-light dark:border-border-dark text-sm font-bold hover:bg-gray-100 dark:hover:bg-gray-800">
 <span class="truncate">Browse Schools</span>
 </a>
 </div>

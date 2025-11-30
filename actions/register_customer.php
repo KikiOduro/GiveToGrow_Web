@@ -23,6 +23,7 @@ require_once __DIR__ . '/../controllers/customer_controller.php';
 $email    = trim($_POST['email']    ?? '');
 $password = trim($_POST['password'] ?? '');
 $confirm  = trim($_POST['confirm']  ?? '');
+$redirect = trim($_POST['redirect'] ?? '');
 
 // Generate a display name from their email address
 $name = '';
@@ -39,21 +40,21 @@ $role = 'customer';
 // First check ; did they actually fill everything out?
 if ($email === '' || $password === '' || $confirm === '') {
     $_SESSION['register_error'] = "All fields are required.";
-    header("Location: ../login/register.php");
+    header("Location: ../login/register.php" . (!empty($redirect) ? '?redirect=' . urlencode($redirect) : ''));
     exit;
 }
 
 // Is this actually a valid email format?
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     $_SESSION['register_error'] = "Invalid email format.";
-    header("Location: ../login/register.php");
+    header("Location: ../login/register.php" . (!empty($redirect) ? '?redirect=' . urlencode($redirect) : ''));
     exit;
 }
 
 // Do both password fields match? (catching typos here)
 if ($password !== $confirm) {
     $_SESSION['register_error'] = "Passwords do not match.";
-    header("Location: ../login/register.php");
+    header("Location: ../login/register.php" . (!empty($redirect) ? '?redirect=' . urlencode($redirect) : ''));
     exit;
 }
 
@@ -62,7 +63,7 @@ $existing = get_customer_by_email_ctr($email);
 
 if ($existing) {
     $_SESSION['register_error'] = "Email is already registered.";
-    header("Location: ../login/register.php");
+    header("Location: ../login/register.php" . (!empty($redirect) ? '?redirect=' . urlencode($redirect) : ''));
     exit;
 }
 
@@ -72,7 +73,7 @@ $user_id = register_customer_ctr($name, $email, $password, $role);
 if (!$user_id) {
     // Something went wrong on the database side
     $_SESSION['register_error'] = "Registration failed. Try again.";
-    header("Location: ../login/register.php");
+    header("Location: ../login/register.php" . (!empty($redirect) ? '?redirect=' . urlencode($redirect) : ''));
     exit;
 }
 
@@ -81,7 +82,21 @@ $_SESSION['user_id']    = $user_id;
 $_SESSION['user_name']  = $name;
 $_SESSION['user_email'] = $email;
 $_SESSION['user_role']  = $role;
+$_SESSION['logged_in']  = true;
 
-// Send them to the login page 
-header("Location: ../login/login.php");
+// Redirect to intended destination if specified, otherwise to dashboard
+if (!empty($redirect) && strpos($redirect, 'http') === 0) {
+    // Validate the redirect URL to prevent open redirect vulnerabilities
+    $parsed_url = parse_url($redirect);
+    $host = $parsed_url['host'] ?? '';
+    
+    // Only allow redirects to same domain or localhost
+    if ($host === 'localhost' || $host === '127.0.0.1' || strpos($host, '169.239.251.102') !== false) {
+        header('Location: ' . $redirect);
+        exit;
+    }
+}
+
+// Default: send them to the dashboard
+header("Location: ../views/dashboard.php");
 exit;

@@ -1,14 +1,9 @@
 <?php
 session_start();
 
-// Check if user is logged in
-if (!isset($_SESSION['user_id'])) {
-    header("Location: ../login/login.php");
-    exit();
-}
-
-// Get user information from session
-$user_name = isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : 'User';
+// Guest browsing allowed - no login required for about page
+$is_logged_in = isset($_SESSION['user_id']);
+$user_name = $is_logged_in ? htmlspecialchars($_SESSION['user_name']) : 'Guest';
 
 // Fetch impact statistics from database
 require_once __DIR__ . '/../settings/db_class.php';
@@ -103,10 +98,19 @@ if ($total_donated >= 1000) {
                 <a class="text-[#131514] dark:text-background-light text-sm font-medium leading-normal hover:text-primary dark:hover:text-primary" href="#contact">Contact</a>
             </nav>
             <div class="flex gap-2 items-center">
+                <?php if ($is_logged_in): ?>
                 <span class="text-sm text-[#131514]\">Welcome, <strong><?php echo $user_name; ?></strong></span>
                 <a href="../actions/logout.php" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-background-light text-[#131514] text-sm font-bold leading-normal tracking-[0.015em] border border-primary/20 hover:bg-primary/10">
                     <span class="truncate">Log Out</span>
                 </a>
+                <?php else: ?>
+                <a href="../login/login.php" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-background-light text-[#131514] text-sm font-bold leading-normal tracking-[0.015em] border border-primary/20 hover:bg-primary/10">
+                    <span class="truncate">Log In</span>
+                </a>
+                <a href="../login/register.php" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-opacity-90">
+                    <span class="truncate">Sign Up</span>
+                </a>
+                <?php endif; ?>
             </div>
         </div>
         <button class="lg:hidden text-[#131514] dark:text-background-light">

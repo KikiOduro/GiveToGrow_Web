@@ -1,14 +1,10 @@
 <?php
 session_start();
 
-// Check if user is logged in
-if (!isset($_SESSION['user_id'])) {
-    header("Location: ../login/login.php");
-    exit();
-}
-
-// Get user information from session
-$user_name = isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : 'User';
+// Guest browsing allowed - no login required to view schools
+// Check if user is logged in (for personalized features)
+$is_logged_in = isset($_SESSION['user_id']);
+$user_name = $is_logged_in ? htmlspecialchars($_SESSION['user_name']) : 'Guest';
 $user_email = isset($_SESSION['user_email']) ? htmlspecialchars($_SESSION['user_email']) : '';
 
 // Fetch schools from database
@@ -146,15 +142,26 @@ if ($category_filter && $category_filter != 'all') {
     </nav>
     <div class="flex gap-2 items-center">
         <?php if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin'): ?>
+        <?php if ($is_logged_in): ?>
         <a href="cart.php" class="relative flex items-center justify-center h-10 w-10 rounded-full hover:bg-primary/10 transition-colors">
             <span class="material-symbols-outlined text-[#131514] dark:text-background-light">shopping_cart</span>
             <span id="cart-count" class="absolute -top-1 -right-1 bg-primary text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span>
         </a>
         <?php endif; ?>
+        <?php endif; ?>
+        <?php if ($is_logged_in): ?>
         <span class="text-sm text-[#131514] dark:text-background-light">Welcome, <strong><?php echo $user_name; ?></strong></span>
         <a href="../actions/logout.php" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-background-light dark:bg-background-dark text-[#131514] dark:text-background-light text-sm font-bold leading-normal tracking-[0.015em] border border-primary/20 hover:bg-primary/10">
             <span class="truncate">Log Out</span>
         </a>
+        <?php else: ?>
+        <a href="../login/login.php" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-background-light dark:bg-background-dark text-[#131514] dark:text-background-light text-sm font-bold leading-normal tracking-[0.015em] border border-primary/20 hover:bg-primary/10">
+            <span class="truncate">Log In</span>
+        </a>
+        <a href="../login/register.php" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-opacity-90">
+            <span class="truncate">Sign Up</span>
+        </a>
+        <?php endif; ?>
     </div>
 </div>
 <button class="lg:hidden text-[#131514] dark:text-background-light">

@@ -1,14 +1,10 @@
 <?php
 session_start();
 
-// Check if user is logged in
-if (!isset($_SESSION['user_id'])) {
-    header("Location: ../login/login.php");
-    exit();
-}
-
-// Get user information from session
-$user_name = isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : 'User';
+// Guest browsing allowed - no login required to view dashboard/landing page
+// Check if user is logged in (for personalized features)
+$is_logged_in = isset($_SESSION['user_id']);
+$user_name = $is_logged_in ? htmlspecialchars($_SESSION['user_name']) : 'Guest';
 $user_email = isset($_SESSION['user_email']) ? htmlspecialchars($_SESSION['user_email']) : '';
 
 // Fetch featured schools from database
@@ -81,36 +77,38 @@ if ($featured_schools === false) {
     $featured_schools = [];
 }
 
-// Fetch recent updates for schools the user has donated to (with error handling)
+// Fetch recent updates for schools the user has donated to (only if logged in)
 $user_updates = [];
-try {
-    // Check if school_updates table exists
-    $table_check = $db->db_fetch_one("SHOW TABLES LIKE 'school_updates'");
-    
-    if ($table_check) {
-        $user_updates_query = "
-            SELECT su.*, s.school_name, s.image_url as school_image,
-                   un.is_read
-            FROM school_updates su
-            JOIN schools s ON su.school_id = s.school_id
-            LEFT JOIN update_notifications un ON su.update_id = un.update_id AND un.user_id = ?
-            WHERE su.school_id IN (
-                SELECT DISTINCT school_id 
-                FROM donations 
-                WHERE user_id = ? AND payment_status = 'completed'
-            )
-            AND su.is_published = 1
-            ORDER BY su.created_at DESC
-            LIMIT 5
-        ";
-        $user_updates = $db->db_fetch_all($user_updates_query, [$_SESSION['user_id'], $_SESSION['user_id']]);
-        if ($user_updates === false) {
-            $user_updates = [];
+if ($is_logged_in) {
+    try {
+        // Check if school_updates table exists
+        $table_check = $db->db_fetch_one("SHOW TABLES LIKE 'school_updates'");
+        
+        if ($table_check) {
+            $user_updates_query = "
+                SELECT su.*, s.school_name, s.image_url as school_image,
+                       un.is_read
+                FROM school_updates su
+                JOIN schools s ON su.school_id = s.school_id
+                LEFT JOIN update_notifications un ON su.update_id = un.update_id AND un.user_id = ?
+                WHERE su.school_id IN (
+                    SELECT DISTINCT school_id 
+                    FROM donations 
+                    WHERE user_id = ? AND payment_status = 'completed'
+                )
+                AND su.is_published = 1
+                ORDER BY su.created_at DESC
+                LIMIT 5
+            ";
+            $user_updates = $db->db_fetch_all($user_updates_query, [$_SESSION['user_id'], $_SESSION['user_id']]);
+            if ($user_updates === false) {
+                $user_updates = [];
+            }
         }
+    } catch (Exception $e) {
+        // Silently fail if impact tracking tables don't exist yet
+        $user_updates = [];
     }
-} catch (Exception $e) {
-    // Silently fail if impact tracking tables don't exist yet
-    $user_updates = [];
 }
 ?>
 <!DOCTYPE html>
@@ -173,10 +171,19 @@ try {
                 <?php endif; ?>
             </nav>
     <div class="flex gap-2 items-center">
+        <?php if ($is_logged_in): ?>
         <span class="text-sm text-[#131514]">Welcome, <strong><?php echo $user_name; ?></strong></span>
         <a href="../actions/logout.php" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-background-light text-[#131514] text-sm font-bold leading-normal tracking-[0.015em] border border-primary/20 hover:bg-primary/10">
             <span class="truncate">Log Out</span>
         </a>
+        <?php else: ?>
+        <a href="../login/login.php" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-background-light text-[#131514] text-sm font-bold leading-normal tracking-[0.015em] border border-primary/20 hover:bg-primary/10">
+            <span class="truncate">Log In</span>
+        </a>
+        <a href="../login/register.php" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-opacity-90">
+            <span class="truncate">Sign Up</span>
+        </a>
+        <?php endif; ?>
     </div>
 </div>
 <button class="lg:hidden text-[#131514] dark:text-background-light">
@@ -200,17 +207,24 @@ try {
 </div>
 <div class="flex-wrap gap-3 flex">
     <?php if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin'): ?>
-    <!-- Check if user has donated -->
+    <!-- Check if user has donated (only for logged-in users) -->
     <?php
-    $has_donated_query = "SELECT COUNT(*) as donation_count FROM donations WHERE user_id = ? AND payment_status = 'completed'";
-    $has_donated_result = $db->db_fetch_one($has_donated_query, [$_SESSION['user_id']]);
-    $has_donated = $has_donated_result && $has_donated_result['donation_count'] > 0;
+    $has_donated = false;
+    if ($is_logged_in) {
+        $has_donated_query = "SELECT COUNT(*) as donation_count FROM donations WHERE user_id = ? AND payment_status = 'completed'";
+        $has_donated_result = $db->db_fetch_one($has_donated_query, [$_SESSION['user_id']]);
+        $has_donated = $has_donated_result && $has_donated_result['donation_count'] > 0;
+    }
     ?>
     
-    <?php if ($has_donated): ?>
+    <?php if ($is_logged_in && $has_donated): ?>
     <a href= "my_impact.php" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-5 bg-primary text-white text-base font-bold leading-normal tracking-[0.015em] hover:bg-opacity-90 gap-2">
         <span class="material-symbols-outlined">insights</span>
         <span class="truncate">View My Impact</span>
+    </a>
+    <?php elseif (!$is_logged_in): ?>
+    <a href="../login/login.php" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-5 bg-primary text-white text-base font-bold leading-normal tracking-[0.015em] hover:bg-opacity-90">
+        <span class="truncate">Start Giving Today</span>
     </a>
     <?php else: ?>
     <a href="schools.php" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-5 bg-primary text-white text-base font-bold leading-normal tracking-[0.015em] hover:bg-opacity-90">

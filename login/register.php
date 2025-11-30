@@ -5,6 +5,15 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
 
 $register_error = $_SESSION['register_error'] ?? '';
 unset($_SESSION['register_error']);
+
+// Get redirect URL from query param
+$redirect = $_GET['redirect'] ?? '';
+
+// Simple escape helper
+function e($value)
+{
+  return htmlspecialchars($value ?? '', ENT_QUOTES, 'UTF-8');
+}
 ?>
 <!DOCTYPE html>
 <html lang="en" class="light">
@@ -126,6 +135,9 @@ unset($_SESSION['register_error']);
                 method="POST"
                 action="../actions/register_customer.php"
                 class="flex w-full flex-col items-center">
+                
+                <!-- Hidden redirect field -->
+                <input type="hidden" name="redirect" value="<?php echo e($redirect); ?>" />
 
                 <!-- Email -->
                 <div class="w-full">
@@ -218,7 +230,7 @@ unset($_SESSION['register_error']);
                 <div class="w-full pt-6 text-center">
                     <p class="text-sm text-gray-600 dark:text-gray-400">
                         Already have an account?
-                        <a href="login.php" class="font-semibold text-primary hover:underline">Sign In</a>
+                        <a href="login.php<?php echo !empty($redirect) ? '?redirect=' . urlencode($redirect) : ''; ?>" class="font-semibold text-primary hover:underline">Sign In</a>
                     </p>
                 </div>
             </form>
