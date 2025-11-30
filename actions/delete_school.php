@@ -46,7 +46,7 @@ try {
         $stmt->execute();
         $stmt->close();
         
-        // Finally, delete the school
+        // Delete the school
         $delete_school = "DELETE FROM schools WHERE school_id = ?";
         $stmt = $conn->prepare($delete_school);
         $stmt->bind_param('i', $school_id);

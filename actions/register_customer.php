@@ -16,7 +16,7 @@
 
 session_start();
 
-// Bring in our controller functions
+// Bring in controller functions
 require_once __DIR__ . '/../controllers/customer_controller.php';
 
 // Grab and clean up the form data
@@ -24,8 +24,7 @@ $email    = trim($_POST['email']    ?? '');
 $password = trim($_POST['password'] ?? '');
 $confirm  = trim($_POST['confirm']  ?? '');
 
-// Since we don't have a separate name field, let's make one from their email
-// This turns "john.doe@example.com" into "John Doe" - not perfect but works!
+// Generate a display name from their email address
 $name = '';
 if ($email !== '') {
     $localPart = strstr($email, '@', true) ?: $email; // Get the part before @
@@ -36,9 +35,8 @@ if ($email !== '') {
 // Everyone starts as a regular customer (admins are created manually in the database)
 $role = 'customer';
 
-// Time to validate everything they entered
 
-// First check - did they actually fill everything out?
+// First check ; did they actually fill everything out?
 if ($email === '' || $password === '' || $confirm === '') {
     $_SESSION['register_error'] = "All fields are required.";
     header("Location: ../login/register.php");
@@ -68,8 +66,7 @@ if ($existing) {
     exit;
 }
 
-// All good! Let's create their account
-// Note: The controller will hash the password for security
+// The controller will hash the password for security
 $user_id = register_customer_ctr($name, $email, $password, $role);
 
 if (!$user_id) {
@@ -79,12 +76,12 @@ if (!$user_id) {
     exit;
 }
 
-// Success! Set up their session so they're logged in
+// Set up their session so they're logged in
 $_SESSION['user_id']    = $user_id;
 $_SESSION['user_name']  = $name;
 $_SESSION['user_email'] = $email;
 $_SESSION['user_role']  = $role;
 
-// Send them to the login page (or we could send them straight to dashboard since they're logged in)
+// Send them to the login page 
 header("Location: ../login/login.php");
 exit;

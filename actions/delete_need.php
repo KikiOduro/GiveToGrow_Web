@@ -42,7 +42,7 @@ try {
         exit();
     }
     
-    // First, remove any cart items referencing this need
+    // remove any cart items referencing this need
     $delete_cart = "DELETE FROM cart WHERE need_id = ?";
     $stmt = $conn->prepare($delete_cart);
     if ($stmt) {

@@ -36,12 +36,11 @@ if (trim($email) === '' || trim($password) === '') {
     exit;
 }
 
-// Try to find this user in our database
+// Look up the user by email
 // The controller returns false if user doesn't exist, or an array with their info if they do
 $result = login_customer_ctr($email);
 
-// Now let's verify they got the password right
-// We use password_verify() because passwords are hashed for security
+//  use password_verify() because passwords are hashed for security
 if ($result && password_verify($password, $result['password_hash'])) {
     // Success! Let's set up their session so they stay logged in
     $_SESSION['user_id']    = $result['user_id'];
@@ -50,12 +49,12 @@ if ($result && password_verify($password, $result['password_hash'])) {
     $_SESSION['user_role']  = $result['user_role'] ?? 'customer'; // Default to customer if role not set
     $_SESSION['logged_in']  = true;
 
-    // Send them to their dashboard - they're officially logged in!
+    // Send users to their dashboard
     header('Location: ../views/dashboard.php');
     exit;
 }
 
-// If we got here, something went wrong - either email doesn't exist or password was wrong
+// If it gets here, something went wrong ; either email doesn't exist or password was wrong
 $_SESSION['login_error'] = 'Invalid login credentials.';
 header('Location: ../login/login.php');
 exit;

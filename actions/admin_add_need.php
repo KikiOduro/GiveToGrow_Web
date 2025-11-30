@@ -35,7 +35,7 @@ if (isset($_POST['image_url']) && !empty($_POST['image_url'])) {
     $image_url = trim($_POST['image_url']);
 }
 
-// Debug: Log what we received
+// Log what is received
 error_log("ADD NEED - Received image_url: '" . $image_url . "'");
 error_log("ADD NEED - POST data: " . print_r($_POST, true));
 error_log("ADD NEED - Raw POST image_url isset: " . (isset($_POST['image_url']) ? 'yes' : 'no'));

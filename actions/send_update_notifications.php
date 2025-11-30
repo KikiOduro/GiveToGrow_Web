@@ -68,10 +68,10 @@ function getEmailTemplate($donor, $update, $update_url) {
     
     $update_type_text = [
         'general' => 'General Update',
-        'milestone' => 'Milestone Achieved! 🎉',
+        'milestone' => 'Milestone Achieved!',
         'progress' => 'Progress Report',
-        'completion' => 'Project Completed! ✅',
-        'thank_you' => 'Thank You Message 💚'
+        'completion' => 'Project Completed!',
+        'thank_you' => 'Thank You Message'
     ];
     $type_label = $update_type_text[$update['update_type']] ?? 'Update';
     
@@ -124,9 +124,4 @@ function getEmailTemplate($donor, $update, $update_url) {
 HTML;
 }
 
-// Example usage (commented out - this would be called from post_update.php)
-// if (isset($_GET['update_id'])) {
-//     $count = sendUpdateNotifications($_GET['update_id']);
-//     echo "Sent notifications to {$count} donors.";
-// }
 ?>

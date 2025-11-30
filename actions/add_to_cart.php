@@ -2,9 +2,9 @@
 session_start();
 header('Content-Type: application/json');
 
-// Enable error logging
+//  error logging
 error_reporting(E_ALL);
-ini_set('display_errors', 0); // Don't display errors in response
+ini_set('display_errors', 0);
 ini_set('log_errors', 1);
 
 if (!isset($_SESSION['user_id'])) {
