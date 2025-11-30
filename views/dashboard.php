@@ -208,7 +208,7 @@ try {
     ?>
     
     <?php if ($has_donated): ?>
-    <a href="/../views/my_impact.php" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-5 bg-primary text-white text-base font-bold leading-normal tracking-[0.015em] hover:bg-opacity-90 gap-2">
+    <a href="my_impact.php" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-5 bg-primary text-white text-base font-bold leading-normal tracking-[0.015em] hover:bg-opacity-90 gap-2">
         <span class="material-symbols-outlined">insights</span>
         <span class="truncate">View My Impact</span>
     </a>
