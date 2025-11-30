@@ -268,7 +268,8 @@ try {
             <div class="flex items-center gap-4 bg-white dark:bg-neutral-800/50 p-4 rounded-lg mb-4 border border-neutral-200 dark:border-neutral-700">
                 <img class="h-24 w-24 rounded-md object-cover flex-shrink-0" 
                      alt="<?php echo htmlspecialchars($need['item_name']); ?>" 
-                     src="<?php echo htmlspecialchars($need['image_url']); ?>"/>
+                     src="<?php echo htmlspecialchars($need['image_url']); ?>"
+                     onerror="this.onerror=null; this.src='https://placehold.co/200x200/A4B8A4/white?text=No+Image'"/>
                 <div class="flex-grow">
                     <p class="font-bold text-neutral-800 dark:text-neutral-100">
                         <?php echo htmlspecialchars($need['item_name']); ?>
