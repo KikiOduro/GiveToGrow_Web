@@ -157,19 +157,9 @@ $total = $subtotal;
                                     <?php echo htmlspecialchars($item['school_name']); ?>, <?php echo htmlspecialchars($item['country']); ?>
                                 </p>
                                 <div class="flex items-center gap-4 mt-2">
-                                    <div class="flex items-center gap-2">
-                                        <button onclick="updateQuantity(<?php echo $item['cart_id']; ?>, -1)" 
-                                                class="flex h-7 w-7 items-center justify-center rounded-full border border-neutral-300 dark:border-neutral-600 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors">
-                                            <span class="material-symbols-outlined text-sm">remove</span>
-                                        </button>
-                                        <span class="text-sm font-semibold text-[#333333] dark:text-neutral-100 min-w-8 text-center">
-                                            <?php echo $item['quantity']; ?>
-                                        </span>
-                                        <button onclick="updateQuantity(<?php echo $item['cart_id']; ?>, 1)" 
-                                                class="flex h-7 w-7 items-center justify-center rounded-full border border-neutral-300 dark:border-neutral-600 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors">
-                                            <span class="material-symbols-outlined text-sm">add</span>
-                                        </button>
-                                    </div>
+                                    <span class="text-sm font-semibold text-[#333333] dark:text-neutral-100">
+                                        Qty: <?php echo $item['quantity']; ?>
+                                    </span>
                                     <span class="text-sm text-neutral-500 dark:text-neutral-400">×</span>
                                     <span class="text-sm font-semibold text-[#333333] dark:text-neutral-100">
                                         ₵<?php echo number_format($item['unit_price'], 2); ?>
@@ -223,42 +213,6 @@ $total = $subtotal;
 </div>
 
 <script>
-// Update item quantity
-function updateQuantity(cartId, change) {
-    const formData = new FormData();
-    formData.append('cart_id', cartId);
-    formData.append('action', 'update_quantity');
-    formData.append('change', change);
-    
-    fetch('actions/update_cart.php', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Reload page to show updated quantities and totals
-            location.reload();
-        } else {
-            Swal.fire({
-                title: 'Error!',
-                text: data.message || 'Failed to update quantity',
-                icon: 'error',
-                confirmButtonColor: '#A4B8A4'
-            });
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        Swal.fire({
-            title: 'Error!',
-            text: 'An error occurred. Please try again.',
-            icon: 'error',
-            confirmButtonColor: '#A4B8A4'
-        });
-    });
-}
-
 // Remove item from cart
 function removeFromCart(cartId) {
     Swal.fire({
@@ -276,7 +230,7 @@ function removeFromCart(cartId) {
             formData.append('cart_id', cartId);
             formData.append('action', 'remove');
             
-            fetch('actions/update_cart.php', {
+            fetch('../actions/update_cart.php', {
                 method: 'POST',
                 body: formData
             })
@@ -291,22 +245,14 @@ function removeFromCart(cartId) {
                         timer: 1500
                     }).then(() => location.reload());
                 } else {
-                    Swal.fire({
-                        title: 'Error!',
-                        text: data.message || 'Failed to remove item',
-                        icon: 'error',
-                        confirmButtonColor: '#A4B8A4'
-                    });
+                    // Still reload page even if server reports error - item may already be deleted
+                    location.reload();
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                Swal.fire({
-                    title: 'Error!',
-                    text: 'An error occurred. Please try again.',
-                    icon: 'error',
-                    confirmButtonColor: '#A4B8A4'
-                });
+                // Reload anyway - the item might be deleted
+                location.reload();
             });
         }
     });
