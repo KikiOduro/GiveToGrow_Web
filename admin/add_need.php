@@ -271,7 +271,7 @@ $schools = $db->db_fetch_all("SELECT school_id, school_name, location FROM schoo
                             
                             <!-- Preview (hidden by default) -->
                             <div id="image-preview" class="hidden">
-                                <img id="preview-img" src="" alt="Preview" class="max-h-48 mx-auto rounded-lg shadow-md"/>
+                                <img id="preview-img" src="" alt="Preview" class="max-h-48 mx-auto rounded-lg shadow-md" onerror="this.src='https://placehold.co/200x200/A4B8A4/white?text=Invalid+URL'"/>
                                 <p id="preview-name" class="text-sm text-gray-600 dark:text-gray-400 mt-2"></p>
                                 <button type="button" onclick="event.stopPropagation(); removeImage();" class="mt-2 text-red-500 hover:text-red-700 text-sm flex items-center gap-1 mx-auto">
                                     <span class="material-symbols-outlined text-lg">delete</span>
@@ -286,13 +286,19 @@ $schools = $db->db_fetch_all("SELECT school_id, school_name, location FROM schoo
                                 <input type="checkbox" id="use-url-input" onchange="toggleUrlInput()" class="rounded border-gray-300"/>
                                 Or enter image URL directly
                             </label>
-                            <input type="url" id="direct-url-input" 
-                                   class="hidden mt-2 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-sm"
-                                   placeholder="https://example.com/image.jpg"
-                                   onchange="setDirectUrl(this.value)"/>
+                            <div id="url-input-container" class="hidden mt-2 flex gap-2">
+                                <input type="url" id="direct-url-input" 
+                                       class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-sm"
+                                       placeholder="https://example.com/image.jpg"
+                                       oninput="previewDirectUrl(this.value)"/>
+                                <button type="button" onclick="confirmDirectUrl()" 
+                                        class="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-opacity-90">
+                                    Set Image
+                                </button>
+                            </div>
                         </div>
                         
-                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Images are securely stored on Cloudinary</p>
+                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Upload via Cloudinary or paste an image URL directly</p>
                     </div>
                 </div>
                 
@@ -421,30 +427,76 @@ function removeImage() {
 // Toggle direct URL input visibility
 function toggleUrlInput() {
     const checkbox = document.getElementById('use-url-input');
-    const urlInput = document.getElementById('direct-url-input');
+    const urlContainer = document.getElementById('url-input-container');
     
     if (checkbox.checked) {
-        urlInput.classList.remove('hidden');
-        urlInput.focus();
+        urlContainer.classList.remove('hidden');
+        document.getElementById('direct-url-input').focus();
     } else {
-        urlInput.classList.add('hidden');
+        urlContainer.classList.add('hidden');
     }
 }
 
-// Set image URL from direct input
+// Preview the direct URL as user types
+function previewDirectUrl(url) {
+    if (url && url.trim() && (url.startsWith('http://') || url.startsWith('https://'))) {
+        // Show a temporary preview
+        document.getElementById('preview-img').src = url.trim();
+    }
+}
+
+// Confirm and set the direct URL
+function confirmDirectUrl() {
+    const url = document.getElementById('direct-url-input').value.trim();
+    
+    if (!url) {
+        Swal.fire({
+            title: 'URL Required',
+            text: 'Please enter an image URL.',
+            icon: 'warning',
+            confirmButtonColor: '#A4B8A4'
+        });
+        return;
+    }
+    
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        Swal.fire({
+            title: 'Invalid URL',
+            text: 'Please enter a valid URL starting with http:// or https://',
+            icon: 'warning',
+            confirmButtonColor: '#A4B8A4'
+        });
+        return;
+    }
+    
+    // Set the hidden input value
+    document.getElementById('image_url').value = url;
+    
+    // Show preview
+    document.getElementById('upload-placeholder').classList.add('hidden');
+    document.getElementById('image-preview').classList.remove('hidden');
+    document.getElementById('preview-img').src = url;
+    document.getElementById('preview-name').textContent = 'Image from URL';
+    
+    // Update container style
+    document.getElementById('upload-container').classList.remove('border-dashed');
+    document.getElementById('upload-container').classList.add('border-solid', 'border-primary');
+    
+    Swal.fire({
+        title: 'Image Set!',
+        text: 'Image URL has been set successfully.',
+        icon: 'success',
+        confirmButtonColor: '#A4B8A4',
+        timer: 1500
+    });
+    
+    console.log('Image URL set to:', url); // Debug log
+}
+
+// Set image URL from direct input (legacy function for compatibility)
 function setDirectUrl(url) {
     if (url && url.trim()) {
-        document.getElementById('image_url').value = url.trim();
-        
-        // Show preview
-        document.getElementById('upload-placeholder').classList.add('hidden');
-        document.getElementById('image-preview').classList.remove('hidden');
-        document.getElementById('preview-img').src = url.trim();
-        document.getElementById('preview-name').textContent = 'Direct URL';
-        
-        // Update container style
-        document.getElementById('upload-container').classList.remove('border-dashed');
-        document.getElementById('upload-container').classList.add('border-solid', 'border-primary');
+        confirmDirectUrl();
     }
 }
 
