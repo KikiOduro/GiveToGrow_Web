@@ -261,38 +261,24 @@ $schools = $db->db_fetch_all("SELECT school_id, school_name, location FROM schoo
                         <!-- Hidden input to store the image URL -->
                         <input type="hidden" id="image_url" name="image_url" value=""/>
                         
-                        <!-- Direct URL Input (Primary Option) -->
-                        <div class="mb-4">
-                            <label class="block text-sm text-gray-600 dark:text-gray-400 mb-2">Paste image URL from the web:</label>
-                            <div class="flex gap-2">
-                                <input type="url" id="direct-url-input" 
-                                       class="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-[#131514] dark:text-background-light focus:ring-2 focus:ring-primary focus:border-transparent"
-                                       placeholder="https://example.com/image.jpg"/>
-                                <button type="button" onclick="setImageUrl()" 
-                                        class="px-6 py-3 bg-primary text-white rounded-lg font-bold hover:bg-opacity-90">
-                                    Set Image
-                                </button>
+                        <!-- Image Preview & Upload -->
+                        <div class="flex gap-4 items-start">
+                            <div id="image-preview-container" class="w-32 h-32 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center overflow-hidden">
+                                <img id="preview-img" src="https://placehold.co/200x200/e5e7eb/9ca3af?text=No+Image" alt="Preview" 
+                                     class="w-full h-full object-cover"
+                                     onerror="this.src='https://placehold.co/200x200/ef4444/white?text=Invalid+URL'"/>
                             </div>
-                        </div>
-                        
-                        <!-- Image Preview -->
-                        <div id="image-preview-container" class="hidden border-2 border-solid border-primary rounded-lg p-4 text-center">
-                            <img id="preview-img" src="" alt="Preview" class="max-h-48 mx-auto rounded-lg shadow-md" onerror="this.src='https://placehold.co/200x200/ef4444/white?text=Invalid+URL'"/>
-                            <p id="preview-name" class="text-sm text-green-600 dark:text-green-400 mt-2 font-medium">✓ Image URL set</p>
-                            <button type="button" onclick="removeImage();" class="mt-2 text-red-500 hover:text-red-700 text-sm flex items-center gap-1 mx-auto">
-                                <span class="material-symbols-outlined text-lg">delete</span>
-                                Remove Image
-                            </button>
-                        </div>
-                        
-                        <!-- Cloudinary Upload (Secondary Option) -->
-                        <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                            <p class="text-sm text-gray-500 mb-2">Or upload from your computer:</p>
-                            <button type="button" onclick="openUploadWidget()" 
-                                    class="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800">
-                                <span class="material-symbols-outlined">cloud_upload</span>
-                                Upload via Cloudinary
-                            </button>
+                            <div class="flex-1">
+                                <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">Upload an image or paste a URL from the web</p>
+                                <button type="button" onclick="openImageUploader()" 
+                                        class="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg font-bold hover:bg-opacity-90">
+                                    <span class="material-symbols-outlined">add_photo_alternate</span>
+                                    Add Image
+                                </button>
+                                <p id="image-status" class="mt-2 text-sm text-gray-500 hidden">
+                                    <span class="text-green-600 font-medium">✓ Image set</span>
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -314,90 +300,53 @@ $schools = $db->db_fetch_all("SELECT school_id, school_name, location FROM schoo
 </div>
 
 <script>
-// Cloudinary configuration (optional - for file uploads)
+// Cloudinary configuration
 const CLOUDINARY_CLOUD_NAME = 'dlih7wpyw';
 const CLOUDINARY_UPLOAD_PRESET = 'givetogrow_unsigned';
 
-// Set image from URL input
-function setImageUrl() {
-    const urlInput = document.getElementById('direct-url-input');
-    const url = urlInput.value.trim();
-    
-    if (!url) {
-        Swal.fire({
-            title: 'URL Required',
-            text: 'Please paste an image URL.',
-            icon: 'warning',
-            confirmButtonColor: '#A4B8A4'
-        });
-        return;
-    }
-    
-    if (!url.startsWith('http://') && !url.startsWith('https://')) {
-        Swal.fire({
-            title: 'Invalid URL',
-            text: 'Please enter a valid URL starting with http:// or https://',
-            icon: 'warning',
-            confirmButtonColor: '#A4B8A4'
-        });
-        return;
-    }
-    
-    // Set the hidden input value
-    document.getElementById('image_url').value = url;
-    
-    // Show preview
-    document.getElementById('image-preview-container').classList.remove('hidden');
-    document.getElementById('preview-img').src = url;
-    
-    Swal.fire({
-        title: 'Image Set!',
-        text: 'Image URL has been set successfully.',
-        icon: 'success',
-        confirmButtonColor: '#A4B8A4',
-        timer: 1500
-    });
-}
-
-// Remove image
-function removeImage() {
-    document.getElementById('image_url').value = '';
-    document.getElementById('direct-url-input').value = '';
-    document.getElementById('image-preview-container').classList.add('hidden');
-    document.getElementById('preview-img').src = '';
-}
-
-// Cloudinary upload (optional)
-function openUploadWidget() {
-    if (typeof cloudinary === 'undefined') {
-        Swal.fire({
-            title: 'Upload Not Available',
-            text: 'Please use the URL input instead to add an image.',
-            icon: 'info',
-            confirmButtonColor: '#A4B8A4'
-        });
-        return;
-    }
-    
+// Open image uploader (same as manage_needs.php)
+function openImageUploader() {
     cloudinary.openUploadWidget({
         cloudName: CLOUDINARY_CLOUD_NAME,
         uploadPreset: CLOUDINARY_UPLOAD_PRESET,
         sources: ['local', 'url', 'camera'],
         multiple: false,
         maxFiles: 1,
+        maxFileSize: 10000000,
         resourceType: 'image',
-        folder: 'givetogrow/needs'
+        clientAllowedFormats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+        cropping: true,
+        croppingAspectRatio: 1,
+        folder: 'givetogrow/needs',
+        styles: {
+            palette: {
+                window: "#FFFFFF",
+                windowBorder: "#A4B8A4",
+                tabIcon: "#A4B8A4",
+                link: "#A4B8A4",
+                action: "#A4B8A4",
+                inProgress: "#A4B8A4",
+                complete: "#10B981",
+                sourceBg: "#F7F7F7"
+            }
+        }
     }, (error, result) => {
         if (!error && result && result.event === "success") {
             const imageUrl = result.info.secure_url;
             
+            // Set the hidden input
             document.getElementById('image_url').value = imageUrl;
-            document.getElementById('direct-url-input').value = imageUrl;
-            document.getElementById('image-preview-container').classList.remove('hidden');
+            
+            // Update preview
             document.getElementById('preview-img').src = imageUrl;
+            document.getElementById('image-preview-container').classList.remove('border-dashed', 'border-gray-300');
+            document.getElementById('image-preview-container').classList.add('border-solid', 'border-primary');
+            
+            // Show status
+            document.getElementById('image-status').classList.remove('hidden');
             
             Swal.fire({
-                title: 'Image Uploaded!',
+                title: 'Image Set!',
                 icon: 'success',
                 confirmButtonColor: '#A4B8A4',
                 timer: 1500
@@ -414,7 +363,7 @@ document.querySelector('form').addEventListener('submit', function(e) {
         e.preventDefault();
         Swal.fire({
             title: 'Image Required',
-            text: 'Please set an image URL before submitting.',
+            text: 'Please add an image before submitting.',
             icon: 'warning',
             confirmButtonColor: '#A4B8A4'
         });
