@@ -102,22 +102,6 @@ if ($is_logged_in) {
         }
     </script>
     <script>
-        // Theme toggle functionality
-        // function initTheme() {
-        //     const theme = localStorage.getItem('theme') || 'light';
-        //     document.documentElement.classList.toggle('dark', theme === 'dark');
-        // }
-        
-        // function toggleTheme() {
-        //     const html = document.documentElement;
-        //     const isDark = html.classList.contains('dark');
-        //     html.classList.toggle('dark');
-        //     localStorage.setItem('theme', isDark ? 'light' : 'dark');
-        // }
-        
-        // // Initialize theme on page load
-        // initTheme();
-
         // Check if user is logged in (passed from PHP)
         const isLoggedIn = <?php echo $is_logged_in ? 'true' : 'false'; ?>;
 

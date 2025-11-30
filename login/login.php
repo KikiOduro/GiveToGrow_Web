@@ -92,41 +92,7 @@ function e($value)
     }
   </style>
 
-  <!-- Dark mode toggle logic -->
-  <script>
-    // const applyTheme = (theme) => {
-    //   const root = document.documentElement;
-    //   if (theme === "dark") {
-    //     root.classList.add("dark");
-    //     root.classList.remove("light");
-    //   } else {
-    //     root.classList.remove("dark");
-    //     root.classList.add("light");
-    //   }
-    // };
 
-    // const initTheme = () => {
-    //   const stored = localStorage.getItem("theme");
-    //   if (stored === "dark" || stored === "light") {
-    //     applyTheme(stored);
-    //   } else {
-    //     const prefersDark = window.matchMedia(
-    //       "(prefers-color-scheme: dark)"
-    //     ).matches;
-    //     applyTheme(prefersDark ? "dark" : "light");
-    //   }
-    // };
-
-    // const toggleTheme = () => {
-    //   const isDark = document.documentElement.classList.contains("dark");
-    //   const next = isDark ? "light" : "dark";
-    //   applyTheme(next);
-    //   localStorage.setItem("theme", next);
-    // };
-
-    // Initialize theme on page load
-    // initTheme();
-  </script>
 </head>
 
 <body
@@ -136,7 +102,7 @@ function e($value)
     <!-- Header -->
     <header
       class="absolute top-0 left-0 right-0 flex items-center justify-between px-6 py-4 sm:px-8 sm:py-6">
-      <div class="flex items-center gap-3 text-[#131514] dark:text-white">
+      <div class="flex items-center gap-3 text-[#131514]">
         <div class="h-8 w-8">
           <img src="../assets/logo.png" alt="GiveToGrow Logo" class="h-full w-full object-contain"/>
         </div>
@@ -144,17 +110,6 @@ function e($value)
           GiveToGrow
         </h2>
       </div>
-
-      <!-- Theme toggle -->
-            <!-- Theme toggle -->
-      <!-- <button
-        onclick="toggleTheme()"
-        type="button"
-        class="flex items-center justify-center h-10 w-10 rounded-full bg-white/70 dark:bg-gray-900/60 border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition"
-        aria-label="Toggle theme">
-        <span class="material-symbols-outlined dark:hidden">dark_mode</span>
-        <span class="material-symbols-outlined hidden dark:inline">light_mode</span>
-      </button> -->
     </header>
 
     <!-- Login Card -->

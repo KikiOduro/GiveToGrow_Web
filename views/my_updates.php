@@ -78,19 +78,7 @@ try {
             }
         }
         
-        // function initTheme() {
-        //     const theme = localStorage.getItem('theme') || 'light';
-        //     document.documentElement.classList.toggle('dark', theme === 'dark');
-        // }
-        
-        // function toggleTheme() {
-        //     const html = document.documentElement;
-        //     const isDark = html.classList.contains('dark');
-        //     html.classList.toggle('dark');
-        //     localStorage.setItem('theme', isDark ? 'light' : 'dark');
-        // }
-        
-        // initTheme();
+
     </script>
 </head>
 <body class="bg-gray-50 dark:bg-neutral-900 font-display">
@@ -103,10 +91,7 @@ try {
                 </a>
                 <h1 class="text-2xl font-bold text-neutral-800 dark:text-neutral-100">My Impact Updates</h1>
             </div>
-            <button onclick="toggleTheme()" class="p-2 hover:bg-gray-100 dark:hover:bg-neutral-700 rounded-full">
-                <span class="material-symbols-outlined dark:hidden">dark_mode</span>
-                <span class="material-symbols-outlined hidden dark:inline">light_mode</span>
-            </button>
+
         </div>
     </div>
     

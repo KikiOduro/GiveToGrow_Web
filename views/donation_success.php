@@ -90,12 +90,6 @@ $schools_text = count($schools_list) > 1 ? implode(', ', array_slice($schools_li
                 },
             },
         }
-        
-        // function initTheme() {
-        //     const theme = localStorage.getItem('theme') || 'light';
-        //     document.documentElement.classList.toggle('dark', theme === 'dark');
-        // }
-        // initTheme();
     </script>
     <style>
         .material-symbols-outlined {

@@ -57,12 +57,6 @@ error_log("Reference from URL: $reference, User: {$_SESSION['user_id']}");
                 },
             },
         }
-        
-        // function initTheme() {
-        //     const theme = localStorage.getItem('theme') || 'light';
-        //     document.documentElement.classList.toggle('dark', theme === 'dark');
-        // }
-        // initTheme();
     </script>
     <style>
         .spinner {

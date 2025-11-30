@@ -89,15 +89,6 @@ $primary_school = $cart_items[0]['school_name'];
                 },
             },
         }
-        
-        // // Theme toggle functionality
-        // function initTheme() {
-        //     const theme = localStorage.getItem('theme') || 'light';
-        //     document.documentElement.classList.toggle('dark', theme === 'dark');
-        // }
-        
-        // // Initialize theme on page load
-        // initTheme();
     </script>
     <style>
         body {

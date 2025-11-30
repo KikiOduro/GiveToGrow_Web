@@ -70,15 +70,6 @@ $remaining = $need['quantity_needed'] - $quantity_fulfilled;
                 },
             },
         }
-        
-        // // Theme toggle functionality
-        // function initTheme() {
-        //     const theme = localStorage.getItem('theme') || 'light';
-        //     document.documentElement.classList.toggle('dark', theme === 'dark');
-        // }
-        
-        // // Initialize theme on page load
-        // initTheme();
     </script>
     <style>
         .material-symbols-outlined {

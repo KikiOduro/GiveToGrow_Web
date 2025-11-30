@@ -49,20 +49,6 @@ unset($_SESSION['success_message'], $_SESSION['error_message']);
                 },
             },
         }
-        
-        // function initTheme() {
-        //     const theme = localStorage.getItem('theme') || 'light';
-        //     document.documentElement.classList.toggle('dark', theme === 'dark');
-        // }
-        
-        // function toggleTheme() {
-        //     const html = document.documentElement;
-        //     const isDark = html.classList.contains('dark');
-        //     html.classList.toggle('dark');
-        //     localStorage.setItem('theme', isDark ? 'light' : 'dark');
-        // }
-        
-        // initTheme();
     </script>
     <style>
         .material-symbols-outlined {

@@ -87,44 +87,20 @@ function e($value)
                 "opsz" 24;
         }
     </style>
-<script>
-        // Theme toggle functionality
-        // function initTheme() {
-        //     const theme = localStorage.getItem('theme') || 'light';
-        //     if (theme === 'dark') {
-        //         document.documentElement.classList.add('dark');
-        //     }
-        // }
-        // function toggleTheme() {
-        //     const html = document.documentElement;
-        //     if (html.classList.contains('dark')) {
-        //         html.classList.remove('dark');
-        //         localStorage.setItem('theme', 'light');
-        //     } else {
-        //         html.classList.add('dark');
-        //         localStorage.setItem('theme', 'dark');
-        //     }
-        // }
-        // // Initialize theme on page load
-        // initTheme();
-    </script>
+
 </head>
 
 <body class="bg-background-light dark:bg-background-dark font-display text-[#333333] dark:text-gray-200">
     <div class="relative flex min-h-screen w-full flex-col items-center justify-center p-4 sm:p-6">
 
-        <!-- Header with theme toggle -->
+        <!-- Header -->
         <header class="absolute top-0 left-0 right-0 flex items-center justify-between px-6 py-4 sm:px-8 sm:py-6">
-            <div class="flex items-center gap-3 text-[#131514] dark:text-white">
+            <div class="flex items-center gap-3 text-[#131514]">
                 <div class="h-8 w-8">
                     <img src="../assets/logo.png" alt="GiveToGrow Logo" class="h-full w-full object-contain"/>
                 </div>
                 <h2 class="text-xl font-bold leading-tight tracking-tight">GiveToGrow</h2>
             </div>
-            <button onclick="toggleTheme()" class="flex items-center justify-center h-10 w-10 rounded-full bg-white/70 dark:bg-gray-900/60 border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800" aria-label="Toggle theme">
-                <span class="material-symbols-outlined dark:hidden">dark_mode</span>
-                <span class="material-symbols-outlined hidden dark:inline">light_mode</span>
-            </button>
         </header>
 
         <div class="layout-container flex h-full w-full max-w-md grow flex-col items-center justify-center pt-16">
