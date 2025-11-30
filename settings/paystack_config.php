@@ -15,7 +15,7 @@ define('PAYSTACK_VERIFY_ENDPOINT', PAYSTACK_API_URL . '/transaction/verify/');
 
 // Application Configuration
 define('APP_ENVIRONMENT', 'test'); // Change to 'live' in production
-define('APP_BASE_URL', 'http://localhost:8888/GiveToGrow_Web'); // Update with your domain
+define('APP_BASE_URL', 'http://169.239.251.102:442/~akua.oduro'); // Live server URL
 define('PAYSTACK_CALLBACK_URL', APP_BASE_URL . '/views/paystack_callback.php'); // Callback after payment
 
 /**
