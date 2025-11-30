@@ -194,11 +194,20 @@ $schools = $db->db_fetch_all("SELECT school_id, school_name, location FROM schoo
                                     class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-[#131514] dark:text-background-light focus:ring-2 focus:ring-primary focus:border-transparent">
                                 <option value="">Select Category</option>
                                 <option value="Books">Books</option>
-                                <option value="Desks">Desks</option>
-                                <option value="Supplies">Supplies</option>
+                                <option value="TextBooks">TextBooks</option>
                                 <option value="Technology">Technology</option>
-                                <option value="Water">Water</option>
-                                <option value="Other">Other</option>
+                                <option value="Furniture">Furniture</option>
+                                <option value="Sports Equipment">Sports Equipment</option>
+                                <option value="Art Supplies">Art Supplies</option>
+                                <option value="Laboratory Equipment">Laboratory Equipment</option>
+                                <option value="Musical Instruments">Musical Instruments</option>
+                                <option value="School Supplies">School Supplies</option>
+                                <option value="Infrastructure">Infrastructure</option>
+                                <option value="Uniforms">Uniforms</option>
+                                <option value="Clothes">Clothes</option>
+                                <option value="Desks">Desks</option>
+                                <option value="Library Resources">Library Resources</option>
+                                <option value="Computers">Computers</option>
                             </select>
                         </div>
                         
