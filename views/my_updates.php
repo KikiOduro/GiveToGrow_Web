@@ -10,38 +10,34 @@ if (!isset($_SESSION['user_id'])) {
 require_once __DIR__ . '/../settings/db_class.php';
 $db = new db_connection();
 
-// Fetch all updates for schools the user has donated to
-$updates_query = "
-    SELECT su.*, s.school_name, s.image_url as school_image,
-           un.is_read,
-           (SELECT COUNT(*) FROM impact_metrics WHERE school_id = su.school_id) as metrics_count
-    FROM school_updates su
-    JOIN schools s ON su.school_id = s.school_id
-    LEFT JOIN update_notifications un ON su.update_id = un.update_id AND un.user_id = ?
-    WHERE su.school_id IN (
-        SELECT DISTINCT school_id 
-        FROM donations 
-        WHERE user_id = ? AND payment_status = 'completed'
-    )
-    AND su.is_published = 1
-    ORDER BY su.created_at DESC
-";
-$updates = $db->db_fetch_all($updates_query, [$_SESSION['user_id'], $_SESSION['user_id']]);
-
-// Mark all as read
-if (!empty($updates)) {
-    $update_ids = array_column($updates, 'update_id');
-    $placeholders = implode(',', array_fill(0, count($update_ids), '?'));
-    $mark_read_query = "
-        UPDATE update_notifications 
-        SET is_read = 1 
-        WHERE user_id = ? AND update_id IN ($placeholders)
-    ";
-    $params = array_merge([$_SESSION['user_id']], $update_ids);
-    $db->db_query($mark_read_query, $params);
-}
-
+$user_id = $_SESSION['user_id'];
 $user_name = htmlspecialchars($_SESSION['user_name'] ?? 'User');
+
+// Initialize updates as empty array
+$updates = [];
+
+// Fetch all updates for schools the user has donated to
+try {
+    $updates_query = "
+        SELECT su.*, s.school_name, s.image_url as school_image
+        FROM school_updates su
+        JOIN schools s ON su.school_id = s.school_id
+        WHERE su.school_id IN (
+            SELECT DISTINCT school_id 
+            FROM donations 
+            WHERE user_id = ? AND payment_status = 'completed'
+        )
+        AND su.is_published = 1
+        ORDER BY su.created_at DESC
+    ";
+    $result = $db->db_fetch_all($updates_query, [$user_id]);
+    if ($result) {
+        $updates = $result;
+    }
+} catch (Exception $e) {
+    // Table might not exist or query failed
+    $updates = [];
+}
 ?>
 <!DOCTYPE html>
 <html class="light" lang="en">
@@ -111,7 +107,7 @@ $user_name = htmlspecialchars($_SESSION['user_name'] ?? 'User');
         <?php else: ?>
         
         <!-- Stats Summary -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
             <div class="bg-white dark:bg-neutral-800 rounded-lg p-6 border border-gray-200 dark:border-neutral-700">
                 <p class="text-gray-500 dark:text-gray-400 text-sm mb-1">Total Updates</p>
                 <p class="text-3xl font-bold text-neutral-800 dark:text-neutral-100"><?php echo count($updates); ?></p>
@@ -120,12 +116,6 @@ $user_name = htmlspecialchars($_SESSION['user_name'] ?? 'User');
                 <p class="text-gray-500 dark:text-gray-400 text-sm mb-1">Schools Followed</p>
                 <p class="text-3xl font-bold text-neutral-800 dark:text-neutral-100">
                     <?php echo count(array_unique(array_column($updates, 'school_id'))); ?>
-                </p>
-            </div>
-            <div class="bg-white dark:bg-neutral-800 rounded-lg p-6 border border-gray-200 dark:border-neutral-700">
-                <p class="text-gray-500 dark:text-gray-400 text-sm mb-1">Impact Metrics</p>
-                <p class="text-3xl font-bold text-neutral-800 dark:text-neutral-100">
-                    <?php echo array_sum(array_column($updates, 'metrics_count')); ?>
                 </p>
             </div>
         </div>
