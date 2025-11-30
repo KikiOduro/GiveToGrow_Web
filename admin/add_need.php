@@ -7,7 +7,6 @@ session_start();
 require_once __DIR__ . '/../settings/admin_check.php';
 require_once __DIR__ . '/../settings/db_class.php';
 
-
 $db = new db_connection();
 $admin_name = isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : 'Admin';
 
@@ -30,7 +29,6 @@ $schools = $db->db_fetch_all("SELECT school_id, school_name, location FROM schoo
     <title>Add School Need – GiveToGrow Admin</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
     <script>
@@ -149,7 +147,7 @@ $schools = $db->db_fetch_all("SELECT school_id, school_name, location FROM schoo
             </div>
             <?php endif; ?>
             
-            <form action="../actions/admin_add_need.php" method="POST" class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-8">
+            <form action="../actions/admin_add_need.php" method="POST" id="addNeedForm" class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-8">
                 <div class="space-y-6">
                     <!-- Select School -->
                     <div>
@@ -249,49 +247,34 @@ $schools = $db->db_fetch_all("SELECT school_id, school_name, location FROM schoo
                         </div>
                     </div>
                     
-                    <!-- Image Upload -->
+                    <!-- Image URL Input -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Item Image <span class="text-red-500">*</span>
+                        <label for="image_url" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Item Image URL <span class="text-red-500">*</span>
                         </label>
-                        
-                        <!-- Direct URL Input (Primary method) -->
-                        <div class="mb-4">
-                            <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">Paste Image URL:</label>
-                            <div class="flex gap-2">
-                                <input type="text" id="image_url_input" 
-                                       class="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-[#131514] dark:text-background-light focus:ring-2 focus:ring-primary focus:border-transparent"
-                                       placeholder="https://example.com/image.jpg"
-                                       onchange="setImageFromUrl(this.value)"/>
-                                <button type="button" onclick="applyImageUrl()" 
-                                        class="px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-opacity-90">
-                                    Set
-                                </button>
-                            </div>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                            Find an image online, right-click it, and select "Copy Image Address" to get the URL
+                        </p>
+                        <div class="flex gap-2">
+                            <input type="url" id="image_url" name="image_url" required
+                                   class="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-[#131514] dark:text-background-light focus:ring-2 focus:ring-primary focus:border-transparent"
+                                   placeholder="https://example.com/image.jpg"
+                                   oninput="previewImage(this.value)"/>
+                            <button type="button" onclick="previewImage(document.getElementById('image_url').value)" 
+                                    class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-300 dark:hover:bg-gray-600">
+                                Preview
+                            </button>
                         </div>
                         
-                        <!-- Hidden input to store the image URL -->
-                        <input type="hidden" id="image_url" name="image_url" value=""/>
-                        
-                        <!-- Or use Cloudinary -->
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Or upload via Cloudinary:</p>
-                        
-                        <!-- Upload Button -->
-                        <div id="upload-container" class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-primary transition-colors cursor-pointer" onclick="openUploadWidget()">
-                            <div id="upload-placeholder">
-                                <span class="material-symbols-outlined text-4xl text-gray-400 mb-2">cloud_upload</span>
-                                <p class="text-gray-600 dark:text-gray-400 font-medium">Click to upload an item image</p>
-                                <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">Supports: JPG, PNG, GIF, WEBP (Max 10MB)</p>
-                            </div>
-                            
-                            <!-- Preview (hidden by default) -->
-                            <div id="image-preview" class="hidden">
-                                <img id="preview-img" src="" alt="Preview" class="max-h-48 mx-auto rounded-lg shadow-md"/>
-                                <p id="preview-name" class="text-sm text-gray-600 dark:text-gray-400 mt-2"></p>
-                                <button type="button" onclick="event.stopPropagation(); removeImage();" class="mt-2 text-red-500 hover:text-red-700 text-sm flex items-center gap-1 mx-auto">
-                                    <span class="material-symbols-outlined text-lg">delete</span>
-                                    Remove Image
-                                </button>
+                        <!-- Image Preview -->
+                        <div id="image-preview-container" class="mt-4 hidden">
+                            <div class="border-2 border-primary rounded-lg p-4 bg-gray-50 dark:bg-gray-900">
+                                <img id="preview-img" src="" alt="Preview" class="max-h-48 mx-auto rounded-lg shadow-md"
+                                     onerror="this.parentElement.parentElement.classList.add('hidden'); showImageError();"/>
+                                <p class="text-sm text-center text-green-600 dark:text-green-400 mt-2 flex items-center justify-center gap-1">
+                                    <span class="material-symbols-outlined text-lg">check_circle</span>
+                                    Image loaded successfully
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -314,153 +297,38 @@ $schools = $db->db_fetch_all("SELECT school_id, school_name, location FROM schoo
 </div>
 
 <script>
-// Cloudinary configuration
-const CLOUDINARY_CLOUD_NAME = 'dlih7wpyw';
-const CLOUDINARY_UPLOAD_PRESET = 'givetogrow_unsigned';
-
-// Set image from direct URL input
-function setImageFromUrl(url) {
-    if (url && url.startsWith('http')) {
-        document.getElementById('image_url').value = url;
-        showPreview(url, 'Direct URL');
-    }
-}
-
-// Apply image URL button click
-function applyImageUrl() {
-    const url = document.getElementById('image_url_input').value.trim();
-    if (url && url.startsWith('http')) {
-        document.getElementById('image_url').value = url;
-        showPreview(url, 'Direct URL');
-        Swal.fire({
-            title: 'Image Set!',
-            text: 'Image URL has been set successfully.',
-            icon: 'success',
-            confirmButtonColor: '#A4B8A4',
-            timer: 1500
-        });
-    } else {
-        Swal.fire({
-            title: 'Invalid URL',
-            text: 'Please enter a valid image URL starting with http:// or https://',
-            icon: 'warning',
-            confirmButtonColor: '#A4B8A4'
-        });
-    }
-}
-
-// Show image preview
-function showPreview(url, fileName) {
-    document.getElementById('upload-placeholder').classList.add('hidden');
-    document.getElementById('image-preview').classList.remove('hidden');
-    document.getElementById('preview-img').src = url;
-    document.getElementById('preview-name').textContent = fileName;
-    document.getElementById('upload-container').classList.remove('border-dashed');
-    document.getElementById('upload-container').classList.add('border-solid', 'border-primary');
-}
-
-function openUploadWidget() {
-    // Store current scroll position
-    const scrollPos = window.scrollY;
+// Preview image from URL
+function previewImage(url) {
+    const previewContainer = document.getElementById('image-preview-container');
+    const previewImg = document.getElementById('preview-img');
     
-    cloudinary.openUploadWidget({
-        cloudName: CLOUDINARY_CLOUD_NAME,
-        uploadPreset: CLOUDINARY_UPLOAD_PRESET,
-        sources: ['local', 'url', 'camera'],
-        multiple: false,
-        maxFiles: 1,
-        maxFileSize: 10000000, // 10MB
-        resourceType: 'image',
-        clientAllowedFormats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
-        cropping: true,
-        croppingAspectRatio: 1,
-        croppingShowDimensions: true,
-        folder: 'givetogrow/needs',
-        styles: {
-            palette: {
-                window: "#FFFFFF",
-                windowBorder: "#A4B8A4",
-                tabIcon: "#A4B8A4",
-                menuIcons: "#5A616A",
-                textDark: "#000000",
-                textLight: "#FFFFFF",
-                link: "#A4B8A4",
-                action: "#A4B8A4",
-                inactiveTabIcon: "#9CA3AF",
-                error: "#EF4444",
-                inProgress: "#A4B8A4",
-                complete: "#10B981",
-                sourceBg: "#F7F7F7"
-            },
-            fonts: {
-                default: { active: true }
-            }
-        }
-    }, (error, result) => {
-        // Restore scroll ability after widget closes
-        document.body.style.overflow = 'auto';
-        document.documentElement.style.overflow = 'auto';
-        
-        if (result && result.event === "close") {
-            // Widget was closed, restore scroll
-            window.scrollTo(0, scrollPos);
-        }
-        
-        if (!error && result && result.event === "success") {
-            // Get the secure URL
-            const imageUrl = result.info.secure_url;
-            const fileName = result.info.original_filename + '.' + result.info.format;
-            
-            // Update the hidden input AND the visible URL input
-            document.getElementById('image_url').value = imageUrl;
-            document.getElementById('image_url_input').value = imageUrl;
-            
-            // Show preview
-            showPreview(imageUrl, fileName);
-            
-            Swal.fire({
-                title: 'Image Uploaded!',
-                text: 'Your image has been uploaded successfully.',
-                icon: 'success',
-                confirmButtonColor: '#A4B8A4',
-                timer: 2000
-            });
-            
-            // Debug: log to console
-            console.log('Image URL set to:', imageUrl);
-        }
+    if (url && url.startsWith('http')) {
+        previewImg.src = url;
+        previewContainer.classList.remove('hidden');
+    } else {
+        previewContainer.classList.add('hidden');
+    }
+}
+
+// Show error if image fails to load
+function showImageError() {
+    Swal.fire({
+        title: 'Image Error',
+        text: 'Could not load the image. Please check the URL and try again.',
+        icon: 'error',
+        confirmButtonColor: '#A4B8A4'
     });
 }
 
-function removeImage() {
-    // Clear both inputs
-    document.getElementById('image_url').value = '';
-    document.getElementById('image_url_input').value = '';
+// Form validation
+document.getElementById('addNeedForm').addEventListener('submit', function(e) {
+    const imageUrl = document.getElementById('image_url').value.trim();
     
-    // Hide preview, show placeholder
-    document.getElementById('upload-placeholder').classList.remove('hidden');
-    document.getElementById('image-preview').classList.add('hidden');
-    document.getElementById('preview-img').src = '';
-    document.getElementById('preview-name').textContent = '';
-    
-    // Reset container style
-    document.getElementById('upload-container').classList.add('border-dashed');
-    document.getElementById('upload-container').classList.remove('border-solid', 'border-primary');
-}
-
-// Form validation - runs before submit
-document.querySelector('form').addEventListener('submit', function(e) {
-    const imageUrlField = document.getElementById('image_url');
-    const imageUrl = imageUrlField.value;
-    
-    console.log('Form submitting with image_url:', imageUrl); // Debug
-    
-    // Check if URL is valid (must start with http)
     if (!imageUrl || !imageUrl.startsWith('http')) {
         e.preventDefault();
         Swal.fire({
             title: 'Image Required',
-            text: 'Please upload an image for the school need. Click the upload area and select or paste an image.',
+            text: 'Please enter a valid image URL starting with http:// or https://',
             icon: 'warning',
             confirmButtonColor: '#A4B8A4'
         });
