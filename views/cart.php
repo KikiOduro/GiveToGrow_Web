@@ -173,11 +173,11 @@ $total = $subtotal + $processing_fee;
                                     </div>
                                     <span class="text-sm text-neutral-500 dark:text-neutral-400">×</span>
                                     <span class="text-sm font-semibold text-[#333333] dark:text-neutral-100">
-                                        $<?php echo number_format($item['unit_price'], 2); ?>
+                                        ₵<?php echo number_format($item['unit_price'], 2); ?>
                                     </span>
                                     <span class="text-sm text-neutral-500 dark:text-neutral-400">=</span>
                                     <span class="text-sm font-bold text-primary">
-                                        $<?php echo number_format($item['unit_price'] * $item['quantity'], 2); ?>
+                                        ₵<?php echo number_format($item['unit_price'] * $item['quantity'], 2); ?>
                                     </span>
                                 </div>
                             </div>
@@ -200,16 +200,16 @@ $total = $subtotal + $processing_fee;
                 <div class="rounded-xl bg-white dark:bg-neutral-800 p-6 shadow-[0_2px_8px_rgba(0,0,0,0.05)] space-y-4">
                     <div class="flex justify-between items-center text-neutral-600 dark:text-neutral-300">
                         <span>Subtotal</span>
-                        <span>$<?php echo number_format($subtotal, 2); ?></span>
+                        <span>₵<?php echo number_format($subtotal, 2); ?></span>
                     </div>
                     <div class="flex justify-between items-center text-neutral-600 dark:text-neutral-300">
                         <span>Processing Fee</span>
-                        <span>$<?php echo number_format($processing_fee, 2); ?></span>
+                        <span>₵<?php echo number_format($processing_fee, 2); ?></span>
                     </div>
                     <div class="border-t border-dashed border-[#e0e0e0] dark:border-neutral-700 my-4"></div>
                     <div class="flex justify-between items-center text-xl font-bold text-[#333333] dark:text-neutral-100">
                         <span>Total Donation Amount</span>
-                        <span>$<?php echo number_format($total, 2); ?></span>
+                        <span>₵<?php echo number_format($total, 2); ?></span>
                     </div>
                 </div>
             </div>

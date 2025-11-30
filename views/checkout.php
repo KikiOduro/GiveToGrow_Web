@@ -220,21 +220,21 @@ $primary_school = $cart_items[0]['school_name'];
                             <?php foreach ($cart_items as $item): ?>
                             <div class="flex justify-between items-center text-neutral-600 dark:text-neutral-400">
                                 <span><?php echo htmlspecialchars($item['item_name']); ?> (×<?php echo $item['quantity']; ?>)</span>
-                                <span>$<?php echo number_format($item['unit_price'] * $item['quantity'], 2); ?></span>
+                                <span>₵<?php echo number_format($item['unit_price'] * $item['quantity'], 2); ?></span>
                             </div>
                             <?php endforeach; ?>
                         </div>
                         <div class="border-t border-dashed border-neutral-300 dark:border-neutral-700 my-3"></div>
                         <div class="flex justify-between items-center text-base font-bold text-[#131514] dark:text-neutral-100">
                             <span>Total Donation</span>
-                            <span>$<?php echo number_format($total, 2); ?></span>
+                            <span>₵<?php echo number_format($total, 2); ?></span>
                         </div>
                     </section>
                     
                     <!-- Submit Button -->
                     <button type="submit" 
                             class="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-14 bg-primary text-white text-base font-bold leading-normal tracking-[0.015em] hover:bg-opacity-90 transition-colors">
-                        Complete Donation - $<?php echo number_format($total, 2); ?>
+                        Complete Donation - ₵<?php echo number_format($total, 2); ?>
                     </button>
                     
                     <!-- Trust Badges -->

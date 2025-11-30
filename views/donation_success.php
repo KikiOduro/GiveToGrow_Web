@@ -130,7 +130,7 @@ if (!$donation) {
                 
                 <div class="flex justify-between items-center pt-4 border-t border-neutral-200 dark:border-neutral-800">
                     <span class="text-base font-bold text-[#131514] dark:text-white">Total Amount</span>
-                    <span class="text-2xl font-black text-primary">$<?php echo number_format($donation['amount'], 2); ?></span>
+                    <span class="text-2xl font-black text-primary">₵<?php echo number_format($donation['amount'], 2); ?></span>
                 </div>
             </div>
         </div>
