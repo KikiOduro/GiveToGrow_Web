@@ -259,27 +259,27 @@ $schools = $db->db_fetch_all("SELECT school_id, school_name, location FROM schoo
                         </label>
                         
                         <!-- Hidden input to store the image URL -->
-                        <input type="hidden" id="image_url" name="image_url" value=""/>
+                        <input type="hidden" id="image_url" name="image_url" required/>
                         
-                        <!-- Image Preview & Upload -->
-                        <div class="flex gap-4 items-start">
-                            <div id="image-preview-container" class="w-32 h-32 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center overflow-hidden">
-                                <img id="preview-img" src="https://placehold.co/200x200/e5e7eb/9ca3af?text=No+Image" alt="Preview" 
-                                     class="w-full h-full object-cover"
-                                     onerror="this.src='https://placehold.co/200x200/ef4444/white?text=Invalid+URL'"/>
+                        <!-- Upload Button -->
+                        <div id="upload-container" class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-primary transition-colors cursor-pointer" onclick="openUploadWidget()">
+                            <div id="upload-placeholder">
+                                <span class="material-symbols-outlined text-4xl text-gray-400 mb-2">cloud_upload</span>
+                                <p class="text-gray-600 dark:text-gray-400 font-medium">Click to upload an item image</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">Supports: JPG, PNG, GIF, WEBP (Max 10MB)</p>
                             </div>
-                            <div class="flex-1">
-                                <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">Upload an image or paste a URL from the web</p>
-                                <button type="button" onclick="openImageUploader()" 
-                                        class="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg font-bold hover:bg-opacity-90">
-                                    <span class="material-symbols-outlined">add_photo_alternate</span>
-                                    Add Image
+                            
+                            <!-- Preview (hidden by default) -->
+                            <div id="image-preview" class="hidden">
+                                <img id="preview-img" src="" alt="Preview" class="max-h-48 mx-auto rounded-lg shadow-md"/>
+                                <p id="preview-name" class="text-sm text-gray-600 dark:text-gray-400 mt-2"></p>
+                                <button type="button" onclick="event.stopPropagation(); removeImage();" class="mt-2 text-red-500 hover:text-red-700 text-sm flex items-center gap-1 mx-auto">
+                                    <span class="material-symbols-outlined text-lg">delete</span>
+                                    Remove Image
                                 </button>
-                                <p id="image-status" class="mt-2 text-sm text-gray-500 hidden">
-                                    <span class="text-green-600 font-medium">✓ Image set</span>
-                                </p>
                             </div>
                         </div>
+                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Images are securely stored on Cloudinary</p>
                     </div>
                 </div>
                 
@@ -304,66 +304,93 @@ $schools = $db->db_fetch_all("SELECT school_id, school_name, location FROM schoo
 const CLOUDINARY_CLOUD_NAME = 'dlih7wpyw';
 const CLOUDINARY_UPLOAD_PRESET = 'givetogrow_unsigned';
 
-// Open image uploader (same as manage_needs.php)
-function openImageUploader() {
+function openUploadWidget() {
     cloudinary.openUploadWidget({
         cloudName: CLOUDINARY_CLOUD_NAME,
         uploadPreset: CLOUDINARY_UPLOAD_PRESET,
         sources: ['local', 'url', 'camera'],
         multiple: false,
         maxFiles: 1,
-        maxFileSize: 10000000,
+        maxFileSize: 10000000, // 10MB
         resourceType: 'image',
         clientAllowedFormats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
         cropping: true,
         croppingAspectRatio: 1,
+        croppingShowDimensions: true,
         folder: 'givetogrow/needs',
         styles: {
             palette: {
                 window: "#FFFFFF",
                 windowBorder: "#A4B8A4",
                 tabIcon: "#A4B8A4",
+                menuIcons: "#5A616A",
+                textDark: "#000000",
+                textLight: "#FFFFFF",
                 link: "#A4B8A4",
                 action: "#A4B8A4",
+                inactiveTabIcon: "#9CA3AF",
+                error: "#EF4444",
                 inProgress: "#A4B8A4",
                 complete: "#10B981",
                 sourceBg: "#F7F7F7"
+            },
+            fonts: {
+                default: { active: true }
             }
         }
     }, (error, result) => {
         if (!error && result && result.event === "success") {
+            // Get the secure URL
             const imageUrl = result.info.secure_url;
+            const fileName = result.info.original_filename + '.' + result.info.format;
             
-            // Set the hidden input
+            // Update the hidden input
             document.getElementById('image_url').value = imageUrl;
             
-            // Update preview
+            // Show preview
+            document.getElementById('upload-placeholder').classList.add('hidden');
+            document.getElementById('image-preview').classList.remove('hidden');
             document.getElementById('preview-img').src = imageUrl;
-            document.getElementById('image-preview-container').classList.remove('border-dashed', 'border-gray-300');
-            document.getElementById('image-preview-container').classList.add('border-solid', 'border-primary');
+            document.getElementById('preview-name').textContent = fileName;
             
-            // Show status
-            document.getElementById('image-status').classList.remove('hidden');
+            // Update container style
+            document.getElementById('upload-container').classList.remove('border-dashed');
+            document.getElementById('upload-container').classList.add('border-solid', 'border-primary');
             
             Swal.fire({
-                title: 'Image Set!',
+                title: 'Image Uploaded!',
+                text: 'Your image has been uploaded successfully.',
                 icon: 'success',
                 confirmButtonColor: '#A4B8A4',
-                timer: 1500
+                timer: 2000
             });
         }
     });
 }
 
+function removeImage() {
+    // Clear the hidden input
+    document.getElementById('image_url').value = '';
+    
+    // Hide preview, show placeholder
+    document.getElementById('upload-placeholder').classList.remove('hidden');
+    document.getElementById('image-preview').classList.add('hidden');
+    document.getElementById('preview-img').src = '';
+    document.getElementById('preview-name').textContent = '';
+    
+    // Reset container style
+    document.getElementById('upload-container').classList.add('border-dashed');
+    document.getElementById('upload-container').classList.remove('border-solid', 'border-primary');
+}
+
 // Form validation
 document.querySelector('form').addEventListener('submit', function(e) {
     const imageUrl = document.getElementById('image_url').value;
-    
-    if (!imageUrl || imageUrl.trim() === '') {
+    if (!imageUrl) {
         e.preventDefault();
         Swal.fire({
             title: 'Image Required',
-            text: 'Please add an image before submitting.',
+            text: 'Please upload an image for the school need.',
             icon: 'warning',
             confirmButtonColor: '#A4B8A4'
         });
