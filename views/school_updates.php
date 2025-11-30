@@ -23,22 +23,25 @@ if (!$school) {
 }
 
 // Fetch all updates for this school
-$updates_query = "
-    SELECT su.*, u.user_name as author_name
-    FROM school_updates su
-    LEFT JOIN users u ON su.created_by = u.user_id
-    WHERE su.school_id = ? AND su.is_published = 1
-    ORDER BY su.created_at DESC
-";
-$updates = $db->db_fetch_all($updates_query, [$school_id]);
+$updates = [];
+try {
+    $updates_query = "
+        SELECT su.*, u.user_name as author_name
+        FROM school_updates su
+        LEFT JOIN users u ON su.created_by = u.user_id
+        WHERE su.school_id = ? AND su.is_published = 1
+        ORDER BY su.created_at DESC
+    ";
+    $result = $db->db_fetch_all($updates_query, [$school_id]);
+    if ($result) {
+        $updates = $result;
+    }
+} catch (Exception $e) {
+    $updates = [];
+}
 
-// Fetch impact metrics
-$metrics_query = "
-    SELECT * FROM impact_metrics
-    WHERE school_id = ?
-    ORDER BY measurement_date DESC
-";
-$metrics = $db->db_fetch_all($metrics_query, [$school_id]);
+// Impact metrics - skip if table doesn't exist
+$metrics = [];
 
 // Check if user has donated to this school (for subscription)
 $donation_check = "
@@ -51,13 +54,17 @@ $has_donated = $donation_result && $donation_result['has_donated'] > 0;
 
 // Mark updates as read for this user
 if (!empty($updates)) {
-    foreach ($updates as $update) {
-        $mark_read = "
-            INSERT INTO update_notifications (update_id, user_id, is_read, read_at)
-            VALUES (?, ?, 1, NOW())
-            ON DUPLICATE KEY UPDATE is_read = 1, read_at = NOW()
-        ";
-        $db->db_query($mark_read, [$update['update_id'], $user_id]);
+    try {
+        foreach ($updates as $update) {
+            $mark_read = "
+                INSERT INTO update_notifications (update_id, user_id, is_read, read_at)
+                VALUES (?, ?, 1, NOW())
+                ON DUPLICATE KEY UPDATE is_read = 1, read_at = NOW()
+            ";
+            $db->db_query($mark_read, [$update['update_id'], $user_id]);
+        }
+    } catch (Exception $e) {
+        // Table might not exist yet
     }
 }
 

@@ -164,7 +164,7 @@ try {
                         <?php echo nl2br(htmlspecialchars($update['update_description'])); ?>
                     </p>
                     
-                    <a href="school_updates.php?id=<?php echo $update['school_id']; ?>#update-<?php echo $update['update_id']; ?>" 
+                    <a href="school_updates.php?school_id=<?php echo $update['school_id']; ?>#update-<?php echo $update['update_id']; ?>" 
                        class="inline-flex items-center gap-2 text-primary font-medium hover:underline">
                         View Full Impact Report
                         <span class="material-symbols-outlined" style="font-size: 18px;">arrow_forward</span>
