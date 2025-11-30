@@ -326,9 +326,6 @@ if ($result) {
                 <!-- School Updates Section -->
                 <div class="flex justify-between items-center px-1 pb-3 pt-8">
                     <h2 class="text-[#131514] dark:text-background-light text-[22px] font-bold leading-tight tracking-[-0.015em]">Updates From Schools You Support</h2>
-                    <?php if (!empty($recent_updates)): ?>
-                    <a href="my_updates.php" class="text-primary font-medium text-sm hover:underline">View All Updates →</a>
-                    <?php endif; ?>
                 </div>
 
                 <?php if (empty($recent_updates)): ?>

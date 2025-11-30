@@ -299,10 +299,6 @@ try {
 <div class="w-full max-w-6xl">
     <div class="flex justify-between items-center mb-6 px-4">
         <h2 class="text-[#131514] dark:text-background-light text-2xl font-bold leading-tight">Your Impact Updates</h2>
-        <a href="my_updates.php" class="text-primary font-medium hover:underline flex items-center gap-1">
-            View all
-            <span class="material-symbols-outlined text-sm">arrow_forward</span>
-        </a>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-4">
         <?php foreach ($user_updates as $update): 
