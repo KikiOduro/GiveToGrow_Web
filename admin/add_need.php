@@ -255,8 +255,26 @@ $schools = $db->db_fetch_all("SELECT school_id, school_name, location FROM schoo
                             Item Image <span class="text-red-500">*</span>
                         </label>
                         
+                        <!-- Direct URL Input (Primary method) -->
+                        <div class="mb-4">
+                            <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">Paste Image URL:</label>
+                            <div class="flex gap-2">
+                                <input type="text" id="image_url_input" 
+                                       class="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-[#131514] dark:text-background-light focus:ring-2 focus:ring-primary focus:border-transparent"
+                                       placeholder="https://example.com/image.jpg"
+                                       onchange="setImageFromUrl(this.value)"/>
+                                <button type="button" onclick="applyImageUrl()" 
+                                        class="px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-opacity-90">
+                                    Set
+                                </button>
+                            </div>
+                        </div>
+                        
                         <!-- Hidden input to store the image URL -->
                         <input type="hidden" id="image_url" name="image_url" value=""/>
+                        
+                        <!-- Or use Cloudinary -->
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Or upload via Cloudinary:</p>
                         
                         <!-- Upload Button -->
                         <div id="upload-container" class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-primary transition-colors cursor-pointer" onclick="openUploadWidget()">
@@ -276,7 +294,6 @@ $schools = $db->db_fetch_all("SELECT school_id, school_name, location FROM schoo
                                 </button>
                             </div>
                         </div>
-                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Images are securely stored on Cloudinary</p>
                     </div>
                 </div>
                 
@@ -300,6 +317,47 @@ $schools = $db->db_fetch_all("SELECT school_id, school_name, location FROM schoo
 // Cloudinary configuration
 const CLOUDINARY_CLOUD_NAME = 'dlih7wpyw';
 const CLOUDINARY_UPLOAD_PRESET = 'givetogrow_unsigned';
+
+// Set image from direct URL input
+function setImageFromUrl(url) {
+    if (url && url.startsWith('http')) {
+        document.getElementById('image_url').value = url;
+        showPreview(url, 'Direct URL');
+    }
+}
+
+// Apply image URL button click
+function applyImageUrl() {
+    const url = document.getElementById('image_url_input').value.trim();
+    if (url && url.startsWith('http')) {
+        document.getElementById('image_url').value = url;
+        showPreview(url, 'Direct URL');
+        Swal.fire({
+            title: 'Image Set!',
+            text: 'Image URL has been set successfully.',
+            icon: 'success',
+            confirmButtonColor: '#A4B8A4',
+            timer: 1500
+        });
+    } else {
+        Swal.fire({
+            title: 'Invalid URL',
+            text: 'Please enter a valid image URL starting with http:// or https://',
+            icon: 'warning',
+            confirmButtonColor: '#A4B8A4'
+        });
+    }
+}
+
+// Show image preview
+function showPreview(url, fileName) {
+    document.getElementById('upload-placeholder').classList.add('hidden');
+    document.getElementById('image-preview').classList.remove('hidden');
+    document.getElementById('preview-img').src = url;
+    document.getElementById('preview-name').textContent = fileName;
+    document.getElementById('upload-container').classList.remove('border-dashed');
+    document.getElementById('upload-container').classList.add('border-solid', 'border-primary');
+}
 
 function openUploadWidget() {
     // Store current scroll position
@@ -353,18 +411,12 @@ function openUploadWidget() {
             const imageUrl = result.info.secure_url;
             const fileName = result.info.original_filename + '.' + result.info.format;
             
-            // Update the hidden input
+            // Update the hidden input AND the visible URL input
             document.getElementById('image_url').value = imageUrl;
+            document.getElementById('image_url_input').value = imageUrl;
             
             // Show preview
-            document.getElementById('upload-placeholder').classList.add('hidden');
-            document.getElementById('image-preview').classList.remove('hidden');
-            document.getElementById('preview-img').src = imageUrl;
-            document.getElementById('preview-name').textContent = fileName;
-            
-            // Update container style
-            document.getElementById('upload-container').classList.remove('border-dashed');
-            document.getElementById('upload-container').classList.add('border-solid', 'border-primary');
+            showPreview(imageUrl, fileName);
             
             Swal.fire({
                 title: 'Image Uploaded!',
@@ -381,8 +433,9 @@ function openUploadWidget() {
 }
 
 function removeImage() {
-    // Clear the hidden input
+    // Clear both inputs
     document.getElementById('image_url').value = '';
+    document.getElementById('image_url_input').value = '';
     
     // Hide preview, show placeholder
     document.getElementById('upload-placeholder').classList.remove('hidden');
