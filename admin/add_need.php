@@ -269,8 +269,7 @@ $schools = $db->db_fetch_all("SELECT school_id, school_name, location FROM schoo
                         <!-- Image Preview -->
                         <div id="image-preview-container" class="mt-4 hidden">
                             <div class="border-2 border-primary rounded-lg p-4 bg-gray-50 dark:bg-gray-900">
-                                <img id="preview-img" src="" alt="Preview" class="max-h-48 mx-auto rounded-lg shadow-md"
-                                     onerror="this.parentElement.parentElement.classList.add('hidden'); showImageError();"/>
+                                <img id="preview-img" src="" alt="Preview" class="max-h-48 mx-auto rounded-lg shadow-md"/>
                                 <p class="text-sm text-center text-green-600 dark:text-green-400 mt-2 flex items-center justify-center gap-1">
                                     <span class="material-symbols-outlined text-lg">check_circle</span>
                                     Image loaded successfully
@@ -303,21 +302,23 @@ function previewImage(url) {
     const previewImg = document.getElementById('preview-img');
     
     if (url && url.startsWith('http')) {
+        // Set up error handler before setting src
+        previewImg.onerror = function() {
+            previewContainer.classList.add('hidden');
+            Swal.fire({
+                title: 'Image Error',
+                text: 'Could not load the image. Please check the URL and try again.',
+                icon: 'error',
+                confirmButtonColor: '#A4B8A4'
+            });
+        };
+        previewImg.onload = function() {
+            previewContainer.classList.remove('hidden');
+        };
         previewImg.src = url;
-        previewContainer.classList.remove('hidden');
     } else {
         previewContainer.classList.add('hidden');
     }
-}
-
-// Show error if image fails to load
-function showImageError() {
-    Swal.fire({
-        title: 'Image Error',
-        text: 'Could not load the image. Please check the URL and try again.',
-        icon: 'error',
-        confirmButtonColor: '#A4B8A4'
-    });
 }
 
 // Form validation
