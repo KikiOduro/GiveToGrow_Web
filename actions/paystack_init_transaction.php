@@ -33,6 +33,8 @@ if (!isset($_SESSION['user_id'])) {
 $input = json_decode(file_get_contents('php://input'), true);
 $amount = isset($input['amount']) ? floatval($input['amount']) : 0;
 $customer_email = isset($input['email']) ? trim($input['email']) : '';
+$platform_fee = isset($input['platform_fee']) ? floatval($input['platform_fee']) : 0;
+$donation_amount = isset($input['donation_amount']) ? floatval($input['donation_amount']) : $amount;
 
 if (!$amount || !$customer_email) {
     echo json_encode([
@@ -78,6 +80,8 @@ try {
         // Store transaction reference in session for verification later
         $_SESSION['paystack_ref'] = $reference;
         $_SESSION['paystack_amount'] = $amount;
+        $_SESSION['paystack_platform_fee'] = $platform_fee;
+        $_SESSION['paystack_donation_amount'] = $donation_amount;
         $_SESSION['paystack_timestamp'] = time();
         
         error_log("Paystack transaction initialized successfully - Reference: $reference");

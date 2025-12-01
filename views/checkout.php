@@ -49,8 +49,10 @@ foreach ($cart_items as $item) {
     $subtotal += ($item['unit_price'] * $item['quantity']);
 }
 
-$processing_fee = 0; // No processing fee in this design
-$total = $subtotal;
+// Platform fee calculation (5% of subtotal, minimum ₵1)
+$platform_fee_percent = 5;
+$platform_fee = max(1, round($subtotal * ($platform_fee_percent / 100), 2));
+$total = $subtotal; // Base total without platform fee
 
 // Get primary school name for display (first item's school)
 $primary_school = $cart_items[0]['school_name'];
@@ -212,6 +214,25 @@ $primary_school = $cart_items[0]['school_name'];
                         </div>
                     </section>
                     
+                    <!-- Cover Platform Costs Option -->
+                    <section class="rounded-lg bg-green-50 dark:bg-green-900/20 p-4 border border-green-200 dark:border-green-800">
+                        <label class="flex items-start gap-3 cursor-pointer">
+                            <input type="checkbox" id="cover_platform_fee" name="cover_platform_fee" 
+                                   class="mt-1 h-5 w-5 rounded border-green-300 text-green-600 focus:ring-green-500 cursor-pointer"
+                                   checked>
+                            <div class="flex-1">
+                                <p class="text-[#131514] dark:text-neutral-100 font-semibold">
+                                    Cover platform costs (₵<?php echo number_format($platform_fee, 2); ?>)
+                                </p>
+                                <p class="text-sm text-green-700 dark:text-green-400 mt-1">
+                                    <span class="material-symbols-outlined text-sm align-middle">favorite</span>
+                                    Adding this small amount ensures 100% of your donation goes directly to the school.
+                                    GiveToGrow uses this to cover transaction fees and keep the platform running.
+                                </p>
+                            </div>
+                        </label>
+                    </section>
+                    
                     <!-- Donation Summary -->
                     <section class="space-y-4 rounded-lg bg-background-light dark:bg-background-dark p-4 border border-neutral-200 dark:border-neutral-800">
                         <h3 class="text-[#131514] dark:text-neutral-100 text-lg font-bold leading-tight tracking-[-0.015em]">
@@ -224,18 +245,26 @@ $primary_school = $cart_items[0]['school_name'];
                                 <span>₵<?php echo number_format($item['unit_price'] * $item['quantity'], 2); ?></span>
                             </div>
                             <?php endforeach; ?>
+                            <div id="platform_fee_row" class="flex justify-between items-center text-green-600 dark:text-green-400">
+                                <span>Platform support</span>
+                                <span>₵<?php echo number_format($platform_fee, 2); ?></span>
+                            </div>
                         </div>
                         <div class="border-t border-dashed border-neutral-300 dark:border-neutral-700 my-3"></div>
                         <div class="flex justify-between items-center text-base font-bold text-[#131514] dark:text-neutral-100">
-                            <span>Total Donation</span>
-                            <span>₵<?php echo number_format($total, 2); ?></span>
+                            <span>Total</span>
+                            <span id="total_display">₵<?php echo number_format($total + $platform_fee, 2); ?></span>
                         </div>
+                        <p id="donation_note" class="text-xs text-green-600 dark:text-green-400">
+                            <span class="material-symbols-outlined text-xs align-middle">check_circle</span>
+                            100% of ₵<?php echo number_format($subtotal, 2); ?> goes to the school
+                        </p>
                     </section>
                     
                     <!-- Submit Button -->
-                    <button type="submit" 
+                    <button type="submit" id="submit_btn"
                             class="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-14 bg-primary text-white text-base font-bold leading-normal tracking-[0.015em] hover:bg-opacity-90 transition-colors">
-                        Complete Donation - ₵<?php echo number_format($total, 2); ?>
+                        Complete Donation - <span id="btn_total">₵<?php echo number_format($total + $platform_fee, 2); ?></span>
                     </button>
                     
                     <!-- Trust Badges -->
@@ -262,7 +291,38 @@ $primary_school = $cart_items[0]['school_name'];
 
 <script>
 let currentPaymentMethod = 'mobile_money';
-const cartTotal = <?php echo $total; ?>;
+const cartSubtotal = <?php echo $subtotal; ?>;
+const platformFee = <?php echo $platform_fee; ?>;
+let includePlatformFee = true; // Checked by default
+let cartTotal = cartSubtotal + platformFee;
+
+// Handle platform fee checkbox
+document.getElementById('cover_platform_fee').addEventListener('change', function() {
+    includePlatformFee = this.checked;
+    updateTotals();
+});
+
+function updateTotals() {
+    const platformFeeRow = document.getElementById('platform_fee_row');
+    const totalDisplay = document.getElementById('total_display');
+    const btnTotal = document.getElementById('btn_total');
+    const donationNote = document.getElementById('donation_note');
+    
+    if (includePlatformFee) {
+        cartTotal = cartSubtotal + platformFee;
+        platformFeeRow.style.display = 'flex';
+        donationNote.innerHTML = '<span class="material-symbols-outlined text-xs align-middle">check_circle</span> 100% of ₵' + cartSubtotal.toFixed(2) + ' goes to the school';
+        donationNote.className = 'text-xs text-green-600 dark:text-green-400';
+    } else {
+        cartTotal = cartSubtotal;
+        platformFeeRow.style.display = 'none';
+        donationNote.innerHTML = '<span class="material-symbols-outlined text-xs align-middle">info</span> A small portion covers platform operating costs';
+        donationNote.className = 'text-xs text-neutral-500 dark:text-neutral-400';
+    }
+    
+    totalDisplay.textContent = '₵' + cartTotal.toFixed(2);
+    btnTotal.textContent = '₵' + cartTotal.toFixed(2);
+}
 
 function selectPaymentMethod(method) {
     currentPaymentMethod = method;
@@ -325,7 +385,9 @@ document.getElementById('checkoutForm').addEventListener('submit', function(e) {
         },
         body: JSON.stringify({
             amount: cartTotal,
-            email: email
+            email: email,
+            platform_fee: includePlatformFee ? platformFee : 0,
+            donation_amount: cartSubtotal
         })
     })
     .then(response => response.json())

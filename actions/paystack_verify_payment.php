@@ -181,6 +181,20 @@ try {
         $db->db_query($clear_cart_query, [$user_id]);
         error_log("Cart cleared for user: $user_id");
         
+        // Record platform fee if donor chose to cover it
+        $platform_fee = isset($_SESSION['paystack_platform_fee']) ? floatval($_SESSION['paystack_platform_fee']) : 0;
+        if ($platform_fee > 0) {
+            // Try to record platform fee - table may not exist yet
+            try {
+                $fee_query = "INSERT INTO platform_fees (user_id, amount, transaction_ref, created_at) VALUES (?, ?, ?, ?)";
+                $db->db_query($fee_query, [$user_id, $platform_fee, $reference, $transaction_date]);
+                error_log("Platform fee recorded: $platform_fee GHS");
+            } catch (Exception $fee_error) {
+                // Log but don't fail the transaction if platform_fees table doesn't exist
+                error_log("Could not record platform fee (table may not exist): " . $fee_error->getMessage());
+            }
+        }
+        
         // Commit transaction
         mysqli_commit($conn);
         error_log("Database transaction committed successfully");
@@ -188,6 +202,8 @@ try {
         // Clear session payment data
         unset($_SESSION['paystack_ref']);
         unset($_SESSION['paystack_amount']);
+        unset($_SESSION['paystack_platform_fee']);
+        unset($_SESSION['paystack_donation_amount']);
         unset($_SESSION['paystack_timestamp']);
         
         // Get primary donation ID for redirect
