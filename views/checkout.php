@@ -222,12 +222,11 @@ $primary_school = $cart_items[0]['school_name'];
                                    checked>
                             <div class="flex-1">
                                 <p class="text-[#131514] dark:text-neutral-100 font-semibold">
-                                    Cover platform costs (₵<?php echo number_format($platform_fee, 2); ?>)
+                                    Support GiveToGrow (₵<?php echo number_format($platform_fee, 2); ?>)
                                 </p>
                                 <p class="text-sm text-green-700 dark:text-green-400 mt-1">
                                     <span class="material-symbols-outlined text-sm align-middle">favorite</span>
-                                    Adding this small amount ensures 100% of your donation goes directly to the school.
-                                    GiveToGrow uses this to cover transaction fees and keep the platform running.
+                                    Help us keep the platform running and connect more donors with schools in need.
                                 </p>
                             </div>
                         </label>
@@ -257,7 +256,7 @@ $primary_school = $cart_items[0]['school_name'];
                         </div>
                         <p id="donation_note" class="text-xs text-green-600 dark:text-green-400">
                             <span class="material-symbols-outlined text-xs align-middle">check_circle</span>
-                            100% of ₵<?php echo number_format($subtotal, 2); ?> goes to the school
+                            Thank you for supporting GiveToGrow!
                         </p>
                     </section>
                     
@@ -311,12 +310,12 @@ function updateTotals() {
     if (includePlatformFee) {
         cartTotal = cartSubtotal + platformFee;
         platformFeeRow.style.display = 'flex';
-        donationNote.innerHTML = '<span class="material-symbols-outlined text-xs align-middle">check_circle</span> 100% of ₵' + cartSubtotal.toFixed(2) + ' goes to the school';
+        donationNote.innerHTML = '<span class="material-symbols-outlined text-xs align-middle">check_circle</span> Thank you for supporting GiveToGrow!';
         donationNote.className = 'text-xs text-green-600 dark:text-green-400';
     } else {
         cartTotal = cartSubtotal;
         platformFeeRow.style.display = 'none';
-        donationNote.innerHTML = '<span class="material-symbols-outlined text-xs align-middle">info</span> A small portion covers platform operating costs';
+        donationNote.innerHTML = '';
         donationNote.className = 'text-xs text-neutral-500 dark:text-neutral-400';
     }
     
