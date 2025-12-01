@@ -110,6 +110,12 @@ $recent_schools = $db->db_fetch_all("SELECT * FROM schools ORDER BY created_at D
                     </a>
                 </li>
                 <li>
+                    <a href="donations.php" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">
+                        <span class="material-symbols-outlined">volunteer_activism</span>
+                        View Donations
+                    </a>
+                </li>
+                <li>
                     <a href="post_update.php" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">
                         <span class="material-symbols-outlined">campaign</span>
                         Post Update

@@ -147,6 +147,12 @@ if (!$recent_updates) {
                     </a>
                 </li>
                 <li>
+                    <a href="donations.php" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100">
+                        <span class="material-symbols-outlined">volunteer_activism</span>
+                        View Donations
+                    </a>
+                </li>
+                <li>
                     <a href="post_update.php" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-primary/10 text-primary font-medium">
                         <span class="material-symbols-outlined">campaign</span>
                         Post Update
