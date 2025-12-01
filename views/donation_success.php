@@ -49,15 +49,30 @@ $all_donations_query = "SELECT d.*, s.school_name, s.country, sn.item_name
                         ORDER BY d.donation_id ASC";
 $donations = $db->db_fetch_all($all_donations_query, [$user_id, $primary_donation['transaction_date']]);
 
+// Get the transaction reference to find any platform fee
+$transaction_ref = !empty($donations) ? $donations[0]['transaction_id'] : null;
+$platform_fee = 0;
+
+if ($transaction_ref) {
+    $fee_query = "SELECT amount FROM platform_fees WHERE transaction_ref = ? LIMIT 1";
+    $fee_result = $db->db_fetch_one($fee_query, [$transaction_ref]);
+    if ($fee_result) {
+        $platform_fee = floatval($fee_result['amount']);
+    }
+}
+
 // Add up the total and get a nice list of schools
-$total_amount = 0;
+$donation_subtotal = 0;
 $schools_list = [];
 foreach ($donations as $d) {
-    $total_amount += $d['amount'];
+    $donation_subtotal += $d['amount'];
     if (!in_array($d['school_name'], $schools_list)) {
         $schools_list[] = $d['school_name'];
     }
 }
+
+// Total includes platform fee if any
+$total_amount = $donation_subtotal + $platform_fee;
 
 $donor_email = $primary_donation['donor_email'];
 // Format schools nicely: "School A, School B and School C"
@@ -171,7 +186,7 @@ $schools_text = count($schools_list) > 1 ? implode(', ', array_slice($schools_li
                 <div class="space-y-3">
                     <span class="text-sm font-medium text-neutral-600 dark:text-neutral-400">Items Donated</span>
                     <?php foreach ($donations as $donation): ?>
-                    <div class="flex justify-between items-start py-2 <?php echo $donation !== end($donations) ? 'border-b border-neutral-100 dark:border-neutral-800' : ''; ?>">
+                    <div class="flex justify-between items-start py-2 border-b border-neutral-100 dark:border-neutral-800">
                         <div class="flex-1">
                             <p class="font-semibold text-[#131514] dark:text-white text-sm">
                                 <?php echo htmlspecialchars($donation['item_name']); ?> 
@@ -186,6 +201,22 @@ $schools_text = count($schools_list) > 1 ? implode(', ', array_slice($schools_li
                         </span>
                     </div>
                     <?php endforeach; ?>
+                    
+                    <?php if ($platform_fee > 0): ?>
+                    <div class="flex justify-between items-start py-2">
+                        <div class="flex-1">
+                            <p class="font-semibold text-green-600 dark:text-green-400 text-sm">
+                                Platform Support
+                            </p>
+                            <p class="text-xs text-neutral-500 dark:text-neutral-400">
+                                Thank you for supporting GiveToGrow!
+                            </p>
+                        </div>
+                        <span class="font-semibold text-green-600 dark:text-green-400 text-sm">
+                            ₵<?php echo number_format($platform_fee, 2); ?>
+                        </span>
+                    </div>
+                    <?php endif; ?>
                 </div>
                 
                 <!-- Total -->
@@ -278,6 +309,14 @@ $schools_text = count($schools_list) > 1 ? implode(', ', array_slice($schools_li
                     <td class="py-3 text-right text-gray-800">₵<?php echo number_format($donation['amount'], 2); ?></td>
                 </tr>
                 <?php endforeach; ?>
+                <?php if ($platform_fee > 0): ?>
+                <tr class="border-b border-gray-200 bg-green-50">
+                    <td class="py-3 text-green-700">Platform Support</td>
+                    <td class="py-3 text-green-600">GiveToGrow</td>
+                    <td class="py-3 text-center text-green-700">-</td>
+                    <td class="py-3 text-right text-green-700">₵<?php echo number_format($platform_fee, 2); ?></td>
+                </tr>
+                <?php endif; ?>
             </tbody>
             <tfoot>
                 <tr class="border-t-2 border-gray-300">
