@@ -139,8 +139,8 @@ try {
             
             $donation_query = "INSERT INTO donations 
                               (user_id, school_id, need_id, amount, quantity, payment_method, 
-                               payment_status, donor_name, donor_email, transaction_date, is_anonymous) 
-                              VALUES (?, ?, ?, ?, ?, ?, 'completed', ?, ?, ?, 0)";
+                               payment_status, donor_name, donor_email, transaction_date, transaction_id, is_anonymous) 
+                              VALUES (?, ?, ?, ?, ?, ?, 'completed', ?, ?, ?, ?, 0)";
             
             $result = $db->db_query($donation_query, [
                 $user_id,
@@ -151,7 +151,8 @@ try {
                 $payment_method,
                 $user_name,
                 $customer_email,
-                $transaction_date
+                $transaction_date,
+                $reference
             ]);
             
             if ($result) {
