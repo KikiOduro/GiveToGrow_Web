@@ -102,23 +102,27 @@ try {
         throw new Exception("Cart is empty");
     }
     
-    // Calculate expected total
+    // Calculate expected total (cart items)
     $calculated_total = 0.00;
     foreach ($cart_items as $item) {
         $calculated_total += floatval($item['unit_price']) * intval($item['quantity']);
     }
     
-    error_log("Expected cart total: $calculated_total");
+    // Add platform fee if donor chose to include it
+    $platform_fee = isset($_SESSION['paystack_platform_fee']) ? floatval($_SESSION['paystack_platform_fee']) : 0;
+    $expected_total = $calculated_total + $platform_fee;
+    
+    error_log("Expected cart total: $calculated_total, Platform fee: $platform_fee, Total expected: $expected_total");
     
     // Verify amount matches (with small tolerance)
-    if (abs($amount_paid - $calculated_total) > 0.01) {
-        error_log("Amount mismatch - Expected: $calculated_total, Paid: $amount_paid");
+    if (abs($amount_paid - $expected_total) > 0.01) {
+        error_log("Amount mismatch - Expected: $expected_total, Paid: $amount_paid");
         
         echo json_encode([
             'status' => 'error',
             'message' => 'Payment amount does not match cart total',
             'verified' => false,
-            'expected' => number_format($calculated_total, 2),
+            'expected' => number_format($expected_total, 2),
             'paid' => number_format($amount_paid, 2)
         ]);
         exit();
